@@ -15,15 +15,13 @@ class ModifyDictionary(QMainWindow):
         with open('database.json', 'r') as f:
             self.data = json.load(f)
 
+        # data input
         self.word = word
         self.fr_trad = self.data[word]["fr"]
         self.eng_trad = self.data[word]["eng"]
         self.definition = self.data[word]["def"]
         self.type = self.data[word]["type"]
         self.conj = self.data[word]["conj"]
-
-        self.form_1 = QFormLayout()
-        
         self.word_input, self.fr_trad_input, self.eng_trad_input, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
         self.type_input = QComboBox()
         self.type_input.addItems(["fn", "mn", "verb", "adj", "other"])
@@ -34,18 +32,13 @@ class ModifyDictionary(QMainWindow):
         self.definition_input.setText(self.definition)
         self.type_input.setCurrentText(self.type)
 
+        # form
+        self.form_1 = QFormLayout()
         self.form_1.addRow(QLabel("Português"), self.word_input)
         self.form_1.addRow(QLabel("Francês"), self.fr_trad_input)
         self.form_1.addRow(QLabel("Inglês"), self.eng_trad_input)
         self.form_1.addRow(QLabel("Definição"), self.definition_input)
         self.form_1.addRow(QLabel("Tipo"), self.type_input)
-
-        layout = QGridLayout()
-
-        layout.addLayout(self.form_1, 0, 0)
-        widget_1 = QWidget()
-        widget_1.setLayout(layout)
-        self.setCentralWidget(widget_1)
 
         if self.type == "verb":
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
@@ -61,26 +54,36 @@ class ModifyDictionary(QMainWindow):
             self.form_1.addRow(QLabel("Ele"), self.conj2)
             self.form_1.addRow(QLabel("Eles"), self.conj3)
 
-        self.form_3 = QFormLayout()
-
+        # buttons
         self.b1 = QPushButton("Modifier")
-        self.b1.clicked.connect(self.b1Action)
-        self.form_3.addRow(self.b1)
+        self.b1.clicked.connect(self.modify_word)
         self.b2 = QPushButton("Delete")
-        self.b2.clicked.connect(self.b2Action)
-        self.form_3.addRow(self.b2)
+        self.b2.clicked.connect(self.delete_word)
         self.b3 = QPushButton("Cancel")
-        self.b3.clicked.connect(self.b3Action)
-        self.form_3.addRow(self.b3)
+        self.b3.clicked.connect(self.close_window)
 
-        layout.addLayout(self.form_3, 0, 2)
+        # form
+        self.form_2 = QFormLayout()
+        self.form_2.addRow(self.b1)
+        self.form_2.addRow(self.b2)
+        self.form_2.addRow(self.b3)
+
+        # layout
+        layout = QGridLayout()
+
+        layout.addLayout(self.form_1, 0, 0)
+        widget_1 = QWidget()
+        widget_1.setLayout(layout)
+        self.setCentralWidget(widget_1)
+
+        layout.addLayout(self.form_2, 0, 2)
         widget_3 = QWidget()
         widget_3.setLayout(layout)
         self.setCentralWidget(widget_3)
 
-    def b1Action(self):
+    def modify_word(self):
         if self.word_input.text() == "":
-            self.raiseError("Enter a Word")
+            self.raise_error("Enter a Word")
         else:
             if self.word_input.text() != self.word:
                 s = self.data[self.word]["score"]
@@ -95,7 +98,6 @@ class ModifyDictionary(QMainWindow):
                                                     "type": self.type_input.currentText(),
                                                     "score" : s,
                                                     "conj": conj}
-
             else:
                 self.data[self.word]["fr"] = self.fr_trad_input.text()
                 self.data[self.word]["eng"] = self.eng_trad_input.text()
@@ -108,10 +110,9 @@ class ModifyDictionary(QMainWindow):
             
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
-            
             self.close()
 
-    def b2Action(self):
+    def delete_word(self):
         del self.data[self.word]
         self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
         item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
@@ -121,10 +122,10 @@ class ModifyDictionary(QMainWindow):
             json.dump(self.data, f)
         self.close()
 
-    def b3Action(self):
+    def close_window(self):
         self.close()
 
-    def raiseError(self, error):
+    def raise_error(self, error):
         msg = QMessageBox()
         msg.setText(error)
         msg.exec_()

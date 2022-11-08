@@ -9,8 +9,7 @@ class ConjugationTraining(QMainWindow):
     def __init__(self, trainig_mode):
         super().__init__()
         self.setWindowTitle("Treino")
-        self.setGeometry(200,200,700,500)
-        
+        self.setGeometry(200,200,380,480)
         with open('database.json', 'r') as f:
             self.data = json.load(f)
 

@@ -6,10 +6,10 @@ import json
 import numpy as np
 
 class WordTraining(QMainWindow):
-    def __init__(self, word_type):
+    def __init__(self, word_type, screen_dim):
         super().__init__()
         self.setWindowTitle("Word Training")
-        self.setGeometry(200,200,700,500)
+        self.setGeometry(200,200,635,320)
         
         # enable switch between translation
         self.fr2bra = True
@@ -51,13 +51,18 @@ class WordTraining(QMainWindow):
         self.input_text.setFont(QFont('Arial', 14))
         self.input_text.returnPressed.connect(self.input_action)
 
+        # reset knowledge button
+        self.b1 = QPushButton("Reset Knowledge", self)
+        self.b1.clicked.connect(self.reset_knowledge)
+        self.b1.adjustSize()
+
+        # switch translation button
+        self.b2 = QPushButton("Switch Translation", self)
+        self.b2.clicked.connect(self.switch_translation)
+        self.b2.adjustSize()
+
         # layout
         form = QFormLayout()
-
-        form.addRow(head)
-        form.addRow(self.word)
-        form.addRow(self.note)
-        form.addRow(self.input_text)
         
         layout = QGridLayout()
         layout.addLayout(form, 0, 0)
@@ -65,17 +70,12 @@ class WordTraining(QMainWindow):
         widget_1.setLayout(layout)
         self.setCentralWidget(widget_1)
 
-        # reset knowledge button
-        self.b1 = QPushButton("Reset Knowledge", self)
-        self.b1.clicked.connect(self.reset_knowledge)
-        self.b1.move(50,400)
-        self.b1.adjustSize()
-
-        # switch translation button
-        self.b1 = QPushButton("Switch Translation", self)
-        self.b1.clicked.connect(self.switch_translation)
-        self.b1.move(525,25)
-        self.b1.adjustSize()
+        layout.addWidget(head, 0, 1)
+        layout.addWidget(self.word, 1, 1)
+        layout.addWidget(self.note, 2, 1)
+        layout.addWidget(self.input_text, 3, 1)
+        layout.addWidget(self.b1, 4, 0, Qt.AlignLeft | Qt.AlignBottom)
+        layout.addWidget(self.b2, 4, 2, Qt.AlignRight | Qt.AlignBottom)
 
     def select_random_word(self):
         self.update_weights()

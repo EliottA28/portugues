@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 
 from wordTraining import WordTraining
 from conjugationTraining import ConjugationTraining
-from modifier import ModifyDictionary
+from modifyDictionary import ModifyDictionary
 
 import sys
 import json
@@ -12,8 +12,10 @@ import json
 # {"comer": {"fr": "manger", "eng": "eat", "def": "", "type": "verb", "score": 4, "conj": "como_come_comem"}
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, width, height):
         super(MainWindow, self).__init__()
+        self.screen_dim = (width, height)
+
         self.setGeometry(200,200,1000,800)
         self.setWindowTitle('🇧🇷')
 
@@ -171,7 +173,7 @@ class MainWindow(QMainWindow):
             self.raise_error("Você já sabe essa palavra")   
     
     def train_word(self):
-        self.w1 = WordTraining(self.select_training_1.currentText())
+        self.w1 = WordTraining(self.select_training_1.currentText(), self.screen_dim)
         self.w1.show()
 
     def train_conjugation(self):
@@ -212,7 +214,9 @@ class MainWindow(QMainWindow):
 
 def window():
     app = QApplication(sys.argv)
-    win = MainWindow()
+    screen_resolution = app.desktop().screenGeometry()
+    width, height = screen_resolution.width(), screen_resolution.height()
+    win = MainWindow(width, height)
     win.show()
     sys.exit(app.exec_())
 
