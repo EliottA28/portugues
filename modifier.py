@@ -5,11 +5,13 @@ from PyQt5.QtCore import *
 import json
 
 class ModifierWindow(QMainWindow):
-    def __init__(self, word):
+    def __init__(self, word, parent):
         super().__init__()
         self.setWindowTitle("Modifier")
         self.setGeometry(200,200,500,300)
         
+        self.parent = parent
+
         with open('database.json', 'r') as f:
             self.data = json.load(f)
 
@@ -111,6 +113,10 @@ class ModifierWindow(QMainWindow):
 
     def b2Action(self):
         del self.data[self.word]
+        self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
+        item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
+        r = self.parent.word_list.row(item[0])
+        self.parent.word_list.takeItem(r)
         with open('database.json', 'w') as f:
             json.dump(self.data, f)
 

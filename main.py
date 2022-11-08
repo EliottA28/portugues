@@ -145,13 +145,13 @@ class MainWindow(QMainWindow):
                                           "type": self.type.currentText(),
                                           "score" : 0,
                                           "conj": conj}
-            self.new_words.addItems([self.word.text()])
             self.word_list.addItem(self.word.text())
+            self.word_list.sortItems()
+            self.title_3.setText("Palavras ({}) :".format(len(database)))
+            with open('database.json', 'w') as f:
+                json.dump(database, f)
         else:
-            self.raiseError("Você já sabe essa palavra")
-        
-        with open('database.json', 'w') as f:
-            json.dump(database, f)   
+            self.raiseError("Você já sabe essa palavra")   
     
     def b3Action(self):
         self.w1 = TrainingWindow(self.select_training_1.currentText())
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         self.w2.show()
 
     def b5Action(self):
-        self.w3 = ModifierWindow(self.word_list.currentItem().text())
+        self.w3 = ModifierWindow(self.word_list.currentItem().text(), parent=self)
         self.w3.show()
 
     def raiseError(self, error):

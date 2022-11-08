@@ -142,3 +142,6 @@ class TrainingWindow(QMainWindow):
         # setting text to label
         self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
         self.note.setText(self.definition)
+
+    def switch_translation():
+        pass

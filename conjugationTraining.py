@@ -70,7 +70,7 @@ class TrainingVerbWindow(QMainWindow):
         form.addRow(head)
         form.addRow(self.word)
         form.addRow(self.definition)
-        form.addRow(QLabel("Verb Translation"), self.input_text_0)
+        form.addRow(QLabel("Verb Translation (fr or eng)"), self.input_text_0)
         form.addRow(QLabel("Eu"), self.input_text_1)
         form.addRow(QLabel("Ele/Ela/A gente/Você"), self.input_text_2)
         form.addRow(QLabel("Eles/Elas/Vocês"), self.input_text_3)
