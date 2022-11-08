@@ -10,9 +10,11 @@ class ConjugationTraining(QMainWindow):
         super().__init__()
         self.setWindowTitle("Treino")
         self.setGeometry(200,200,380,480)
+
         with open('database.json', 'r') as f:
             self.data = json.load(f)
 
+        # creat list of words
         self.random_word_list = list(self.data.items())
         if trainig_mode == "irregular":
             self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb" and self.irregular(self.random_word_list[i][0], self.random_word_list[i][1]["conj"])]
@@ -28,17 +30,15 @@ class ConjugationTraining(QMainWindow):
         self.random_word()
         self.miss_counter = 0
 
-        form = QFormLayout()
-
+        # head label
         head = QLabel("Conjugation", self)
-  
         font = QFont('Times', 20)
         font.setBold(True)
         font.setUnderline(True)
         head.setFont(font)
         head.setAlignment(Qt.AlignCenter)
 
-        # creating label to show word
+        # label to show word and definition
         self.word = QLabel(self.translation, self)
         self.word.setAlignment(Qt.AlignCenter)
         self.word.setFont(QFont('Times', 30))
@@ -64,6 +64,8 @@ class ConjugationTraining(QMainWindow):
         self.b = QPushButton("Check")
         self.b.clicked.connect(self.bAction)
 
+        # layout
+        form = QFormLayout()
         form.addRow(head)
         form.addRow(self.word)
         form.addRow(self.definition)
@@ -103,7 +105,6 @@ class ConjugationTraining(QMainWindow):
 
         if text_0 != "" and text_1 != "" and text_2 != "" and text_3 != "":
             if (text_0 == self.random_word_fr or text_0 == self.random_word_eng) and text_1 == self.t1 and text_2 == self.t2 and text_3 == self.t3:
-                # clearing line edit text
                 self.input_text_0.setFocus()
                 self.display_new_word()
 
@@ -129,10 +130,7 @@ class ConjugationTraining(QMainWindow):
         self.input_text_2.clear()
         self.input_text_3.clear()
 
-        # random word
         self.random_word()
-
-        # setting text to label
         self.word.setText(self.translation)
         self.definition.setText(self.note)
 
