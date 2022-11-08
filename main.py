@@ -9,8 +9,7 @@ from modifier import ModifyDictionary
 import sys
 import json
   
-# key : word portuguese / value : word french, word english, definition, type (feminin word, masculin word, adj, verb ...)
-# {"comer": {"fr": "manger", "eng": "eat", "def": "", "type": "verb"}, "pequeno": {"fr": "petit", "eng": "small", "def": "", "type": "adj"}}
+# {"comer": {"fr": "manger", "eng": "eat", "def": "", "type": "verb", "score": 4, "conj": "como_come_comem"}
 
 class MainWindow(QMainWindow):
     def __init__(self):

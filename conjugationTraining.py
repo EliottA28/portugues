@@ -4,8 +4,6 @@ from PyQt5.QtCore import *
 
 import json
 import random
-import numpy as np
-
 
 class ConjugationTraining(QMainWindow):
     def __init__(self, trainig_mode):
