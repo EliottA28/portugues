@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 import json
 import numpy as np
 
-class TrainingWindow(QMainWindow):
+class WordTraining(QMainWindow):
     def __init__(self, word_type):
         super().__init__()
         self.setWindowTitle("Word Training")

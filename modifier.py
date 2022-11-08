@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 
 import json
 
-class ModifierWindow(QMainWindow):
+class ModifyDictionary(QMainWindow):
     def __init__(self, word, parent):
         super().__init__()
         self.setWindowTitle("Modifier")

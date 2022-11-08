@@ -2,9 +2,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 
-from wordTraining import TrainingWindow
-from conjugationTraining import TrainingVerbWindow
-from modifier import ModifierWindow
+from wordTraining import WordTraining
+from conjugationTraining import ConjugationTraining
+from modifier import ModifyDictionary
 
 import sys
 import json
@@ -18,21 +18,21 @@ class MainWindow(QMainWindow):
         self.setGeometry(200,200,1000,800)
         self.setWindowTitle('🇧🇷')
 
-        self.initUI()
+        ### layouts ###
 
-    def initUI(self):
-        """add a new word to the database"""
-        ## Add New Word to Database
-        self.form_1 = QFormLayout()
-        
+        ## add word to dictionary
+        # inputs
+        self.title_1 = QLabel("Adicionar uma Nova Palavra :")
+        self.title_1.setFont(QFont("Helvetica", 20, QFont.Bold))
         self.word, self.fr_trad, self.eng_trad, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
         self.type = QComboBox()
         self.type.addItems(["fn", "mn", "verb", "adj", "other"])
         self.type.currentIndexChanged.connect(self.display_input)
         self.b1 = QPushButton("Adicionar uma Nova Palavra")
-        self.title_1 = QLabel("Adicionar uma Nova Palavra :")
-        self.title_1.setFont(QFont("Helvetica", 20, QFont.Bold))
+        self.b1.clicked.connect(self.fill_dictionary)
 
+        # form
+        self.form_1 = QFormLayout()
         self.form_1.addRow(self.title_1)
         self.form_1.addRow(QLabel("Português"), self.word)
         self.form_1.addRow(QLabel("Francês"), self.fr_trad)
@@ -41,9 +41,8 @@ class MainWindow(QMainWindow):
         self.form_1.addRow(QLabel("Tipo"), self.type)
         self.form_1.addRow(self.b1)
 
-        # Word List
-        form_3 = QFormLayout()
-        
+        ## data interface
+        # word list
         self.word_list = QListWidget()
         with open('database.json', 'r+') as f:
             database = json.load(f)
@@ -53,9 +52,13 @@ class MainWindow(QMainWindow):
         self.word_list.resetHorizontalScrollMode()
         self.word_list.sortItems()
         self.word_list.setCurrentRow(0)
-        self.word_list.itemSelectionChanged.connect(self.selectionChanged)
+        self.word_list.itemSelectionChanged.connect(self.selection_changed)
+
+        # search bar
         self.search_bar = QLineEdit()
         self.search_bar.returnPressed.connect(self.search_word)
+
+        # display/modify word info
         self.selected_word = QLabel(self.word_list.currentItem().text())
         self.traduction_fr = QLabel(database[self.selected_word.text()]["fr"])
         self.traduction_eng = QLabel(database[self.selected_word.text()]["eng"])
@@ -64,7 +67,10 @@ class MainWindow(QMainWindow):
         self.title_3 = QLabel("Palavras ({}) :".format(len(database)))
         self.title_3.setFont(QFont("Helvetica", 20, QFont.Bold))
         self.b5 = QPushButton("Modifier/Supprimer")
+        self.b5.clicked.connect(self.modify_dictionary)
 
+        # form
+        form_3 = QFormLayout()
         form_3.addRow(self.title_3)
         form_3.addRow(QLabel("Search Word :"), self.search_bar)
         form_3.addRow(self.word_list)
@@ -72,24 +78,27 @@ class MainWindow(QMainWindow):
         form_3.addRow(QLabel("Tradução Inglesa :"), self.traduction_eng)
         form_3.addRow(QLabel("Definição :"), self.definition)
         form_3.addRow(self.b5)
-        self.b5.clicked.connect(self.b5Action)
         
-        # Test Knowledge
-        form_4 = QFormLayout()
-
+        ## test knowledge
+        # words
         self.select_training_1 = QComboBox()
         self.select_training_1.addItems(["all", "verb", "adj", "noun", "other"])
-
         self.b3 = QPushButton("Ensaio (palavras)")
-        form_4.addRow(self.b3, self.select_training_1)
+        self.b3.clicked.connect(self.train_word)
         
+        # conjugation
         self.select_training_2 = QComboBox()
         self.select_training_2.addItems(["all", "regular", "irregular"])
-
         self.b4 = QPushButton("Ensaio (verbos)")
+        self.b4.clicked.connect(self.train_conjugation)
+
+        # form
+        form_4 = QFormLayout()
+        form_4.addRow(self.b3, self.select_training_1)
         form_4.addRow(self.b4, self.select_training_2)
 
-        # Layout Grid
+        ### layout grid ###
+
         layout = QGridLayout()
 
         layout.addLayout(self.form_1, 0, 0)
@@ -107,13 +116,6 @@ class MainWindow(QMainWindow):
         widget_4.setLayout(layout)
         self.setCentralWidget(widget_4)
 
-        # Button to Add New Word 
-        self.b1.clicked.connect(self.b1Action)
-
-        # Training Button
-        self.b3.clicked.connect(self.b3Action)
-        self.b4.clicked.connect(self.b4Action)
-
     def search_word(self):
         model = self.word_list.model()
         match = model.match(
@@ -125,15 +127,14 @@ class MainWindow(QMainWindow):
         if match:
             self.word_list.setCurrentIndex(match[0])
     
-    def b1Action(self):
-        """add word to dictionary"""
+    def fill_dictionary(self):
         with open('database.json', 'r+') as f:
             database = json.load(f)
 
         if len(self.word.text()) == 0:
-            self.raiseError("Enter a word")
+            self.raise_error("Enter a word")
         if self.type.currentText() == "verb" and (self.conj1.text() == "" or self.conj2.text() == "" or self.conj3.text() == ""):
-            self.raiseError("Enter conjugaison")
+            self.raise_error("Enter conjugaison")
         elif self.word.text() not in database:
             if self.form_1.rowCount() == 11:
                 conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
@@ -151,21 +152,21 @@ class MainWindow(QMainWindow):
             with open('database.json', 'w') as f:
                 json.dump(database, f)
         else:
-            self.raiseError("Você já sabe essa palavra")   
+            self.raise_error("Você já sabe essa palavra")   
     
-    def b3Action(self):
-        self.w1 = TrainingWindow(self.select_training_1.currentText())
+    def train_word(self):
+        self.w1 = WordTraining(self.select_training_1.currentText())
         self.w1.show()
 
-    def b4Action(self):
-        self.w2 = TrainingVerbWindow(self.select_training_2.currentText())
+    def train_conjugation(self):
+        self.w2 = ConjugationTraining(self.select_training_2.currentText())
         self.w2.show()
 
-    def b5Action(self):
-        self.w3 = ModifierWindow(self.word_list.currentItem().text(), parent=self)
+    def modify_dictionary(self):
+        self.w3 = ModifyDictionary(self.word_list.currentItem().text(), parent=self)
         self.w3.show()
 
-    def raiseError(self, error):
+    def raise_error(self, error):
         msg = QMessageBox()
         msg.setText(error)
         msg.exec_()
@@ -184,22 +185,20 @@ class MainWindow(QMainWindow):
                 self.form_1.removeRow(6)
                 self.form_1.removeRow(6)
 
-    def selectionChanged(self):
+    def selection_changed(self):
         with open('database.json', 'r+') as f:
-                database = json.load(f)
+            database = json.load(f)
         self.selected_word.setText(self.word_list.currentItem().text())
         self.traduction_fr.setText(database[self.word_list.currentItem().text()]["fr"])
         self.traduction_eng.setText(database[self.word_list.currentItem().text()]["eng"])
         self.definition.setText(database[self.selected_word.text()]["def"])
 
+
 def window():
     app = QApplication(sys.argv)
-
     win = MainWindow()
-
     win.show()
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     window()

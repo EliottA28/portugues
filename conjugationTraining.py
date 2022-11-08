@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 
-class TrainingVerbWindow(QMainWindow):
+class ConjugationTraining(QMainWindow):
     def __init__(self, trainig_mode):
         super().__init__()
         self.setWindowTitle("Treino")
