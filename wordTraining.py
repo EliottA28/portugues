@@ -11,6 +11,10 @@ class TrainingWindow(QMainWindow):
         self.setWindowTitle("Word Training")
         self.setGeometry(200,200,700,500)
         
+        # enable switch between translation
+        self.fr2bra = True
+
+        # load data
         with open('database.json', 'r') as f:
             self.data = json.load(f)
 
@@ -20,28 +24,20 @@ class TrainingWindow(QMainWindow):
         elif word_type != "all":
             self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == word_type]
         self.type = word_type
-
         self.scores = np.array([self.random_word_list[k][1]['score'] for k in range(len(self.random_word_list))])
-
-        self.update_weights()
-        self.weighted_selection()
         
-        # random word
+        # select a word
         self.select_random_word()
-        self.miss_counter = 0
 
-        form = QFormLayout()
-
-        head = QLabel("Translate the Words", self)
-        head.setGeometry(200, 10, 300, 60)
-  
+        # head label
+        head = QLabel("Translate the Words", self)  
         font = QFont('Times', 20)
         font.setBold(True)
         font.setUnderline(True)
         head.setFont(font)
         head.setAlignment(Qt.AlignCenter)
 
-        # creating label to show word
+        # label to show word and note
         self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng, self)
         self.word.setAlignment(Qt.AlignCenter)
         self.word.setFont(QFont('Times', 30))
@@ -50,10 +46,13 @@ class TrainingWindow(QMainWindow):
         self.note.setAlignment(Qt.AlignCenter)
         self.note.setFont(QFont('Times', 15))
   
-        # creating a line edit
+        # line edit
         self.input_text = QLineEdit(self)
         self.input_text.setFont(QFont('Arial', 14))
         self.input_text.returnPressed.connect(self.input_action)
+
+        # layout
+        form = QFormLayout()
 
         form.addRow(head)
         form.addRow(self.word)
@@ -72,6 +71,12 @@ class TrainingWindow(QMainWindow):
         self.b1.move(50,400)
         self.b1.adjustSize()
 
+        # switch translation button
+        self.b1 = QPushButton("Switch Translation", self)
+        self.b1.clicked.connect(self.switch_translation)
+        self.b1.move(525,25)
+        self.b1.adjustSize()
+
     def select_random_word(self):
         self.update_weights()
         self.weighted_selection()
@@ -87,7 +92,6 @@ class TrainingWindow(QMainWindow):
         self.synonymes = [i[0] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng]
 
     def reset_knowledge(self):
-        # set all scores to 0
         for key in self.data.keys():
             if self.type == "noun":
                 if self.data[key]["type"] == 'fn' or self.data[key]["type"] == 'mn':
@@ -98,33 +102,26 @@ class TrainingWindow(QMainWindow):
                 self.data[key]["score"] = 0
         with open('database.json', 'w') as f:
             json.dump(self.data, f)
-        
         self.scores = np.zeros(len(self.random_word_list))
-        self.update_weights()
-        self.weighted_selection()
         self.display_new_word()
 
     def input_action(self):
-  
         text = self.input_text.text()
         text = text.lower()
-
-        if text != "":
+        if text != "" and self.fr2bra:
             if text == self.translation or text in self.synonymes:
                 self.update_score(self.translation, 1)
-                self.display_new_word()
-
-            elif self.miss_counter < 0:
-                self.miss_counter += 1
-
             else:
                 self.update_score(self.translation, -1)
-                # display correction
-                msg = QMessageBox()
-                msg.setText("Correction\n")
-                msg.setInformativeText(self.random_word_fr +  " : " + self.translation + "\n")
-                msg.exec_()
-                self.display_new_word()
+                self.display_correction(self.random_word_fr +  " : " + self.translation)
+            self.display_new_word()
+        elif text != "" and not self.fr2bra:
+            if text == self.random_word_eng or text == self.random_word_fr:
+                self.update_score(self.translation, 1)
+            else:
+                self.update_score(self.translation, -1)
+                self.display_correction(self.translation +  " : " + self.random_word_fr + ' / ' + self.random_word_eng)
+            self.display_new_word()
 
     def update_score(self, key, i):
         self.data[key]["score"] = max(0, self.data[key]["score"] + i)
@@ -133,15 +130,20 @@ class TrainingWindow(QMainWindow):
             json.dump(self.data, f) 
 
     def display_new_word(self):
-        self.miss_counter = 0
         self.input_text.clear()
-
-        # random word
         self.select_random_word()
-
-        # setting text to label
-        self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
         self.note.setText(self.definition)
+        if self.fr2bra:
+            self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
+        else:
+            self.word.setText(self.translation)
 
-    def switch_translation():
-        pass
+    def switch_translation(self):
+        self.fr2bra = not self.fr2bra
+        self.display_new_word()
+
+    def display_correction(self, correction):
+        msg = QMessageBox()
+        msg.setText("Correction\n")
+        msg.setInformativeText(correction + "\n")
+        msg.exec_()
