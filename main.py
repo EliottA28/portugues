@@ -117,13 +117,30 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget_4)
 
     def search_word(self):
+        with open('database.json', 'r+') as f:
+            database = json.load(f)
+        bra_words = []
+        fr_words = []
+        eng_words = []
+        for k in database.keys():
+            bra_words.append(k)
+            fr_words.append(database[k]["fr"])
+            eng_words.append(database[k]["eng"])
+        
+        word = self.search_bar.text()
+        if word in fr_words:
+            idx = fr_words.index(word)
+            word = bra_words[idx]
+        elif word in eng_words:
+            idx = eng_words.index(word)
+            word = bra_words[idx]
         model = self.word_list.model()
         match = model.match(
             model.index(0, self.word_list.modelColumn()), 
             Qt.DisplayRole, 
-            self.search_bar.text(), 
+            word, 
             hits=1, 
-            flags=Qt.MatchStartsWith)
+            flags=Qt.MatchExactly)
         if match:
             self.word_list.setCurrentIndex(match[0])
     
