@@ -88,6 +88,11 @@ class ModifyDictionary(QMainWindow):
             if self.word_input.text() != self.word:
                 s = self.data[self.word]["score"]
                 del self.data[self.word]
+                item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
+                r = self.parent.word_list.row(item[0])
+                self.parent.word_list.takeItem(r)
+                self.parent.word_list.addItem(self.word_input.text())
+                self.parent.word_list.sortItems()
                 if self.type_input.currentText() == "verb":
                     conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
                 else:
