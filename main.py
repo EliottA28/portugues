@@ -22,6 +22,9 @@ class MainWindow(QMainWindow):
         ### layouts ###
 
         ## add word to dictionary
+        # add multiple translations
+        self.number_of_translations = 3
+        self.counter = [0, 0]
         # inputs
         self.title_1 = QLabel("Adicionar uma Nova Palavra :")
         self.title_1.setFont(QFont("Helvetica", 20, QFont.Bold))
@@ -32,16 +35,30 @@ class MainWindow(QMainWindow):
         self.b1 = QPushButton("Adicionar uma Nova Palavra")
         self.b1.clicked.connect(self.fill_dictionary)
 
+        self.b_add_fr = QPushButton("+")
+        self.b_add_fr.metadata = 0
+        self.b_add_fr.clicked.connect(self.add_translation_row)
+        self.widget_fr = QWidget()
+        layout_h_fr = QHBoxLayout(self.widget_fr)
+        layout_h_fr.addWidget(self.fr_trad)
+        layout_h_fr.addWidget(self.b_add_fr)
+
+        self.b_add_eng = QPushButton("+")
+        self.b_add_eng.metadata = 1
+        self.b_add_eng.clicked.connect(self.add_translation_row)
+        self.widget_eng = QWidget()
+        layout_h_eng = QHBoxLayout(self.widget_eng)
+        layout_h_eng.addWidget(self.eng_trad)
+        layout_h_eng.addWidget(self.b_add_eng)
         # form
         self.form_1 = QFormLayout()
         self.form_1.addRow(self.title_1)
         self.form_1.addRow(QLabel("Português"), self.word)
-        self.form_1.addRow(QLabel("Francês"), self.fr_trad)
-        self.form_1.addRow(QLabel("Inglês"), self.eng_trad)
+        self.form_1.addRow(QLabel("Francês"), self.widget_fr)
+        self.form_1.addRow(QLabel("Inglês"), self.widget_eng)
         self.form_1.addRow(QLabel("Definição"), self.definition_input)
         self.form_1.addRow(QLabel("Tipo"), self.type)
         self.form_1.addRow(self.b1)
-
         ## data interface
         # word list
         self.word_list = QListWidget()
@@ -211,6 +228,29 @@ class MainWindow(QMainWindow):
         self.traduction_eng.setText(database[self.word_list.currentItem().text()]["eng"])
         self.definition.setText(database[self.selected_word.text()]["def"])
 
+    def add_translation_row(self):
+        sender = self.sender()
+        i = sender.metadata
+        b_rm = QPushButton("-")
+        b_rm.metadata = i
+        b_rm.clicked.connect(self.rm_translation_row)
+        tr_input = QLineEdit()
+        widget_tr = QWidget()
+        layout_h_tr = QHBoxLayout(widget_tr)
+        layout_h_tr.addWidget(tr_input)
+        layout_h_tr.addWidget(b_rm)
+        if self.counter[i] < self.number_of_translations:
+            idx, _ = self.form_1.getWidgetPosition(sender.parent())
+            print(idx+self.counter[i])
+            self.form_1.insertRow(idx + self.counter[i] + 1, QLabel(''), widget_tr)
+            self.counter[i] += 1
+
+    def rm_translation_row(self):
+        sender = self.sender()
+        i = sender.metadata
+        idx, _ = self.form_1.getWidgetPosition(sender.parent())
+        self.form_1.removeRow(idx)
+        self.counter[i] -= 1
 
 def window():
     app = QApplication(sys.argv)
