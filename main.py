@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
         self.word, self.fr_trad, self.eng_trad, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
         self.type = QComboBox()
         self.type.addItems(["fn", "mn", "verb", "adj", "other"])
+        self.flag = 0
         self.type.currentIndexChanged.connect(self.display_input)
         self.b1 = QPushButton("Adicionar uma Nova Palavra")
         self.b1.clicked.connect(self.fill_dictionary)
@@ -224,18 +225,22 @@ class MainWindow(QMainWindow):
         msg.exec_()
 
     def display_input(self):
+        sender = self.sender()
+        idx, _ = self.form_1.getWidgetPosition(sender)
         if self.type.currentText() == "verb":
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
-            self.form_1.insertRow(6, QLabel("Conjugation :"))
-            self.form_1.insertRow(7, QLabel("Eu"), self.conj1)
-            self.form_1.insertRow(8, QLabel("Ele"), self.conj2)
-            self.form_1.insertRow(9, QLabel("Eles"), self.conj3)
+            self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
+            self.form_1.insertRow(idx+2, QLabel("Eu"), self.conj1)
+            self.form_1.insertRow(idx+3, QLabel("Ele"), self.conj2)
+            self.form_1.insertRow(idx+4, QLabel("Eles"), self.conj3)
+            self.flag = 1
         else:
-            if self.form_1.rowCount() == 11:
-                self.form_1.removeRow(6)
-                self.form_1.removeRow(6)
-                self.form_1.removeRow(6)
-                self.form_1.removeRow(6)
+            if self.flag:
+                self.form_1.removeRow(idx+1)
+                self.form_1.removeRow(idx+1)
+                self.form_1.removeRow(idx+1)
+                self.form_1.removeRow(idx+1)
+                self.flag = 0
 
     def selection_changed(self):
         with open('database.json', 'r+') as f:
