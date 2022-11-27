@@ -86,10 +86,11 @@ class WordTraining(QMainWindow):
 
     def weighted_selection(self):
         idx = np.random.choice(len(self.random_word_list), p=self.weights)
-        key, value = self.random_word_list[idx]
-        self.translation, self.random_word_fr, self.random_word_eng = key, value["fr"], value["eng"]
-        self.definition = value["def"]
-        self.synonymes = [i[0] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng]
+        dict = self.random_word_list[idx][1]
+        self.word_id = self.random_word_list[idx][0]
+        self.translation, self.random_word_fr, self.random_word_eng = dict["bra"], dict["fr"], dict["eng"]
+        self.definition = dict["def"]
+        self.synonymes = [i[1]["bra"] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng]
 
     def reset_knowledge(self):
         for key in self.data.keys():
@@ -110,16 +111,16 @@ class WordTraining(QMainWindow):
         text = text.lower()
         if text != "" and self.fr2bra:
             if text == self.translation or text in self.synonymes:
-                self.update_score(self.translation, 1)
+                self.update_score(self.word_id, 1)
             else:
-                self.update_score(self.translation, -1)
+                self.update_score(self.word_id, -1)
                 self.display_correction(self.random_word_fr +  " : " + self.translation)
             self.display_new_word()
         elif text != "" and not self.fr2bra:
             if text == self.random_word_eng or text == self.random_word_fr:
-                self.update_score(self.translation, 1)
+                self.update_score(self.word_id, 1)
             else:
-                self.update_score(self.translation, -1)
+                self.update_score(self.word_id, -1)
                 self.display_correction(self.translation +  " : " + self.random_word_fr + ' / ' + self.random_word_eng)
             self.display_new_word()
 

@@ -17,9 +17,9 @@ class ConjugationTraining(QMainWindow):
         # creat list of words
         self.random_word_list = list(self.data.items())
         if trainig_mode == "irregular":
-            self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb" and self.irregular(self.random_word_list[i][0], self.random_word_list[i][1]["conj"])]
+            self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb" and self.irregular(self.random_word_list[i][1]["bra"], self.random_word_list[i][1]["conj"])]
         elif trainig_mode == "regular":
-            self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb" and not self.irregular(self.random_word_list[i][0], self.random_word_list[i][1]["conj"])]
+            self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb" and not self.irregular(self.random_word_list[i][1]["bra"], self.random_word_list[i][1]["conj"])]
         else:
             self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb"]
         random.shuffle(self.random_word_list)
@@ -82,8 +82,8 @@ class ConjugationTraining(QMainWindow):
         self.setCentralWidget(widget_1)
 
     def random_word(self):
-        key, value = self.random_word_list[self.index]
-        self.translation, self.random_word_fr, self.random_word_eng = key, value["fr"], value["eng"]
+        _, value = self.random_word_list[self.index]
+        self.translation, self.random_word_fr, self.random_word_eng = value["bra"], value["fr"], value["eng"]
         self.t1, self.t2, self.t3 = value['conj'].split('_')
         self.index += 1
         self.note = value['def']

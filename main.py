@@ -65,7 +65,10 @@ class MainWindow(QMainWindow):
         with open('database.json', 'r+') as f:
             database = json.load(f)
         for key in database.keys():
-            self.word_list.addItem(key)
+            item_to_add = QListWidgetItem()
+            item_to_add.setText(database[key]["bra"])   
+            item_to_add.setData(Qt.UserRole, key) 
+            self.word_list.addItem(item_to_add)
         self.word_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.word_list.resetHorizontalScrollMode()
         self.word_list.sortItems()
@@ -78,9 +81,10 @@ class MainWindow(QMainWindow):
 
         # display/modify word info
         self.selected_word = QLabel(self.word_list.currentItem().text())
-        self.traduction_fr = QLabel(database[self.selected_word.text()]["fr"])
-        self.traduction_eng = QLabel(database[self.selected_word.text()]["eng"])
-        self.definition = QLabel(database[self.selected_word.text()]["def"])
+        self.word_id = self.word_list.currentItem().data(Qt.UserRole)
+        self.traduction_fr = QLabel(database[self.word_id]["fr"])
+        self.traduction_eng = QLabel(database[self.word_id]["eng"])
+        self.definition = QLabel(database[self.word_id]["def"])
         self.definition.setMaximumSize(int(self.width()*0.4), int(self.height()*0.15))
         self.title_3 = QLabel("Palavras ({}) :".format(len(database)))
         self.title_3.setFont(QFont("Helvetica", 20, QFont.Bold))
@@ -141,10 +145,9 @@ class MainWindow(QMainWindow):
         fr_words = []
         eng_words = []
         for k in database.keys():
-            bra_words.append(k)
+            bra_words.append(database[k]["bra"])
             fr_words.append(database[k]["fr"])
             eng_words.append(database[k]["eng"])
-        
         word = self.search_bar.text()
         if word in fr_words:
             idx = fr_words.index(word)
@@ -162,26 +165,40 @@ class MainWindow(QMainWindow):
         if match:
             self.word_list.setCurrentIndex(match[0])
     
+    def check(self, word, data, i):
+        words = []
+        for d in data:
+            if d[i] == word:
+                words.append(d[2])
+        return words
+
     def fill_dictionary(self):
         with open('database.json', 'r+') as f:
             database = json.load(f)
 
+        data = [(key, value["bra"], value["type"]) for key, value in database.items()]
+
         if len(self.word.text()) == 0:
             self.raise_error("Enter a word")
-        if self.type.currentText() == "verb" and (self.conj1.text() == "" or self.conj2.text() == "" or self.conj3.text() == ""):
+        elif self.type.currentText() == "verb" and (self.conj1.text() == "" or self.conj2.text() == "" or self.conj3.text() == ""):
             self.raise_error("Enter conjugaison")
-        elif self.word.text() not in database:
+        elif not self.check(self.word.text(), data, 1) or self.type.currentText() not in self.check(self.word.text(), data, 1):
             if self.form_1.rowCount() == 11:
                 conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
             else:
                 conj = ""
-            database[self.word.text()] = {"fr": self.fr_trad.text(), 
-                                          "eng": self.eng_trad.text(), 
-                                          "def": self.definition_input.text(), 
-                                          "type": self.type.currentText(),
-                                          "score" : 0,
-                                          "conj": conj}
-            self.word_list.addItem(self.word.text())
+            key = str(int(list(database)[-1])+1)
+            database[key] = {"bra": self.word.text(),
+                            "fr": self.fr_trad.text(), 
+                            "eng": self.eng_trad.text(), 
+                            "def": self.definition_input.text(), 
+                            "type": self.type.currentText(),
+                            "score" : 0,
+                            "conj": conj}
+            item_to_add = QListWidgetItem()
+            item_to_add.setText(self.word.text())   
+            item_to_add.setData(Qt.UserRole, key) 
+            self.word_list.addItem(item_to_add)
             self.word_list.sortItems()
             self.title_3.setText("Palavras ({}) :".format(len(database)))
             with open('database.json', 'w') as f:
@@ -198,7 +215,7 @@ class MainWindow(QMainWindow):
         self.w2.show()
 
     def modify_dictionary(self):
-        self.w3 = ModifyDictionary(self.word_list.currentItem().text(), parent=self)
+        self.w3 = ModifyDictionary(self.word_list.currentItem(), parent=self)
         self.w3.show()
 
     def raise_error(self, error):
@@ -224,9 +241,10 @@ class MainWindow(QMainWindow):
         with open('database.json', 'r+') as f:
             database = json.load(f)
         self.selected_word.setText(self.word_list.currentItem().text())
-        self.traduction_fr.setText(database[self.word_list.currentItem().text()]["fr"])
-        self.traduction_eng.setText(database[self.word_list.currentItem().text()]["eng"])
-        self.definition.setText(database[self.selected_word.text()]["def"])
+        self.word_id = self.word_list.currentItem().data(Qt.UserRole)
+        self.traduction_fr.setText(database[self.word_id]["fr"])
+        self.traduction_eng.setText(database[self.word_id]["eng"])
+        self.definition.setText(database[self.word_id]["def"])
 
     def add_translation_row(self):
         sender = self.sender()

@@ -16,12 +16,13 @@ class ModifyDictionary(QMainWindow):
             self.data = json.load(f)
 
         # data input
-        self.word = word
-        self.fr_trad = self.data[word]["fr"]
-        self.eng_trad = self.data[word]["eng"]
-        self.definition = self.data[word]["def"]
-        self.type = self.data[word]["type"]
-        self.conj = self.data[word]["conj"]
+        self.word = word.text()
+        self.word_id = word.data(Qt.UserRole)
+        self.fr_trad = self.data[self.word_id]["fr"]
+        self.eng_trad = self.data[self.word_id]["eng"]
+        self.definition = self.data[self.word_id]["def"]
+        self.type = self.data[self.word_id]["type"]
+        self.conj = self.data[self.word_id]["conj"]
         self.word_input, self.fr_trad_input, self.eng_trad_input, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
         self.type_input = QComboBox()
         self.type_input.addItems(["fn", "mn", "verb", "adj", "other"])
@@ -39,6 +40,8 @@ class ModifyDictionary(QMainWindow):
         self.form_1.addRow(QLabel("Inglês"), self.eng_trad_input)
         self.form_1.addRow(QLabel("Definição"), self.definition_input)
         self.form_1.addRow(QLabel("Tipo"), self.type_input)
+
+        self.type_input.currentIndexChanged.connect(self.display_conj)
 
         if self.type == "verb":
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
@@ -86,42 +89,46 @@ class ModifyDictionary(QMainWindow):
             self.raise_error("Enter a Word")
         else:
             if self.word_input.text() != self.word:
-                s = self.data[self.word]["score"]
-                del self.data[self.word]
+                s = self.data[self.word_id]["score"]
+                del self.data[self.word_id]
                 item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
                 r = self.parent.word_list.row(item[0])
                 self.parent.word_list.takeItem(r)
-                self.parent.word_list.addItem(self.word_input.text())
+                item_to_add = QListWidgetItem()
+                item_to_add.setText(self.word_input.text())   
+                item_to_add.setData(Qt.UserRole, self.word_id) 
+                self.parent.word_list.addItem(item_to_add)
                 self.parent.word_list.sortItems()
                 if self.type_input.currentText() == "verb":
                     conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
                 else:
                     conj = ""
-                self.data[self.word_input.text()] = {"fr": self.fr_trad_input.text(), 
-                                                    "eng": self.eng_trad_input.text(), 
-                                                    "def": self.definition_input.text(), 
-                                                    "type": self.type_input.currentText(),
-                                                    "score" : s,
-                                                    "conj": conj}
+                self.data[self.word_id] = {"bra": self.word_input.text(),
+                                            "fr": self.fr_trad_input.text(), 
+                                            "eng": self.eng_trad_input.text(), 
+                                            "def": self.definition_input.text(), 
+                                            "type": self.type_input.currentText(),
+                                            "score" : s,
+                                            "conj": conj}
             else:
-                self.data[self.word]["fr"] = self.fr_trad_input.text()
-                self.data[self.word]["eng"] = self.eng_trad_input.text()
-                self.data[self.word]["def"] = self.definition_input.text()
-                self.data[self.word]["type"] = self.type_input.currentText()
+                self.data[self.word_id]["fr"] = self.fr_trad_input.text()
+                self.data[self.word_id]["eng"] = self.eng_trad_input.text()
+                self.data[self.word_id]["def"] = self.definition_input.text()
+                self.data[self.word_id]["type"] = self.type_input.currentText()
                 if self.type_input.currentText() == "verb":
-                    self.data[self.word]["conj"] = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
+                    self.data[self.word_id]["conj"] = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
                 else:
-                    self.data[self.word]["conj"] = ""
+                    self.data[self.word_id]["conj"] = ""
             
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
             self.close()
 
     def delete_word(self):
-        del self.data[self.word]
+        del self.data[self.word_id]
         self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
-        item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
-        r = self.parent.word_list.row(item[0])
+        item = self.parent.word_list.currentItem()
+        r = self.parent.word_list.row(item)
         self.parent.word_list.takeItem(r)
         with open('database.json', 'w') as f:
             json.dump(self.data, f)
@@ -134,3 +141,17 @@ class ModifyDictionary(QMainWindow):
         msg = QMessageBox()
         msg.setText(error)
         msg.exec_()
+
+    def display_conj(self):
+        if self.type_input.currentText() == "verb":
+            self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
+            self.form_1.addRow(QLabel("Conjugation :"))
+            self.form_1.addRow(QLabel("Eu"), self.conj1)
+            self.form_1.addRow(QLabel("Ele"), self.conj2)
+            self.form_1.addRow(QLabel("Eles"), self.conj3)
+        else:
+            if self.form_1.rowCount() == 9:
+                self.form_1.removeRow(5)
+                self.form_1.removeRow(5)
+                self.form_1.removeRow(5)
+                self.form_1.removeRow(5)
