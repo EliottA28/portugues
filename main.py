@@ -181,13 +181,29 @@ class MainWindow(QMainWindow):
 
         if len(self.word.text()) == 0:
             self.raise_error("Enter a word")
-        elif self.type.currentText() == "verb" and (self.conj1.text() == "" or self.conj2.text() == "" or self.conj3.text() == ""):
+        elif self.type.currentText() == "verb" and (self.conj1.text() == "" or self.conj2.text() == "" or self.conj3.text() == "" or self.conj4.text() == "" or self.conj5.text() == "" or self.conj6.text() == ""):
             self.raise_error("Enter conjugaison")
         elif not self.check(self.word.text(), data, 1) or self.type.currentText() not in self.check(self.word.text(), data, 1):
-            if self.form_1.rowCount() == 11:
-                conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
+            if self.type.currentText() == "verb":
+                conj_p = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
+                conj_pp = self.conj4.text() +"_"+ self.conj5.text() +"_"+ self.conj6.text()
             else:
-                conj = ""
+                conj_p = ""
+                conj_pp = ""
+                # for i in self.counter[0]:
+                #     fr_trad = self.fr_trad.text() + self.form_1.children()
+            # print("title",self.form_1.getWidgetPosition(self.title_1), self.form_1.itemAt(0).widget())
+            # print("word",self.form_1.getWidgetPosition(self.word), self.form_1.itemAt(1).widget())
+            # print("fr",self.form_1.getWidgetPosition(self.widget_fr), self.form_1.itemAt(2).widget())
+            # print("eng",self.form_1.getWidgetPosition(self.widget_eng), self.form_1.itemAt(3).widget())
+            # print("eng",self.form_1.getWidgetPosition(self.widget_eng), self.form_1.itemAt(3).widget())
+
+            # idx, _ = self.form_1.getWidgetPosition(self.widget_fr)
+            # print(self.widget_fr.children())
+            # test = self.form_1.itemAt(0)
+            # print(test.widget())
+            # print(test.widget().children()[1].text())
+            # print(ze)
             key = str(int(list(database)[-1])+1)
             database[key] = {"bra": self.word.text(),
                             "fr": self.fr_trad.text(), 
@@ -195,7 +211,8 @@ class MainWindow(QMainWindow):
                             "def": self.definition_input.text(), 
                             "type": self.type.currentText(),
                             "score" : 0,
-                            "conj": conj}
+                            "conj": conj_p,
+                            "conj_pp": conj_pp}
             item_to_add = QListWidgetItem()
             item_to_add.setText(self.word.text())   
             item_to_add.setData(Qt.UserRole, key) 
@@ -228,14 +245,36 @@ class MainWindow(QMainWindow):
         sender = self.sender()
         idx, _ = self.form_1.getWidgetPosition(sender)
         if self.type.currentText() == "verb":
+            
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
+            self.conj4, self.conj5, self.conj6 = QLineEdit(), QLineEdit(), QLineEdit()
+
+            self.widget0 = QWidget()
+            layout_h0 = QHBoxLayout(self.widget0)
+            layout_h0.addWidget(QLabel("Presente                     "))
+            layout_h0.addWidget(QLabel("Pretérito Perfeito"))
+            self.widget1 = QWidget()
+            layout_h1 = QHBoxLayout(self.widget1)
+            layout_h1.addWidget(self.conj1)
+            layout_h1.addWidget(self.conj4)
+            self.widget2 = QWidget()
+            layout_h2 = QHBoxLayout(self.widget2)
+            layout_h2.addWidget(self.conj2)
+            layout_h2.addWidget(self.conj5)
+            self.widget3 = QWidget()
+            layout_h3 = QHBoxLayout(self.widget3)
+            layout_h3.addWidget(self.conj3)
+            layout_h3.addWidget(self.conj6)
+
             self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
-            self.form_1.insertRow(idx+2, QLabel("Eu"), self.conj1)
-            self.form_1.insertRow(idx+3, QLabel("Ele"), self.conj2)
-            self.form_1.insertRow(idx+4, QLabel("Eles"), self.conj3)
+            self.form_1.insertRow(idx+2, QLabel(""), self.widget0)
+            self.form_1.insertRow(idx+3, QLabel("Eu"), self.widget1)
+            self.form_1.insertRow(idx+4, QLabel("Ele"), self.widget2)
+            self.form_1.insertRow(idx+5, QLabel("Eles"), self.widget3)
             self.flag = 1
         else:
             if self.flag:
+                self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
@@ -264,7 +303,6 @@ class MainWindow(QMainWindow):
         layout_h_tr.addWidget(b_rm)
         if self.counter[i] < self.number_of_translations:
             idx, _ = self.form_1.getWidgetPosition(sender.parent())
-            print(idx+self.counter[i])
             self.form_1.insertRow(idx + self.counter[i] + 1, QLabel(''), widget_tr)
             self.counter[i] += 1
 
