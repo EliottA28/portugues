@@ -31,7 +31,7 @@ class WordTraining(QMainWindow):
         self.select_random_word()
 
         # head label
-        head = QLabel("Translate the Words", self)  
+        head = QLabel("Translate the Words " + '(' + self.type + ')', self)  
         font = QFont('Times', 20)
         font.setBold(True)
         font.setUnderline(True)
@@ -39,7 +39,10 @@ class WordTraining(QMainWindow):
         head.setAlignment(Qt.AlignCenter)
 
         # label to show word and note
-        self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng, self)
+        if self.type == 'all':
+            self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng+ ' (' + self.cur_type + ')', self)
+        else:
+            self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng, self)
         self.word.setAlignment(Qt.AlignCenter)
         self.word.setFont(QFont('Times', 30))
 
@@ -79,7 +82,6 @@ class WordTraining(QMainWindow):
         layout.addWidget(self.b2, 4, 2, Qt.AlignRight | Qt.AlignBottom)
 
     def select_random_word(self):
-        print(self.mode)
         if self.mode == "weighted":
             self.weights = np.exp(-self.scores)/np.sum(np.exp(-self.scores))
             idx = np.random.choice(len(self.random_word_list), p=self.weights)
@@ -87,7 +89,7 @@ class WordTraining(QMainWindow):
             idx = np.random.choice(len(self.random_word_list))
         dict = self.random_word_list[idx][1]
         self.word_id = self.random_word_list[idx][0]
-        self.translation, self.random_word_fr, self.random_word_eng = dict["bra"], dict["fr"], dict["eng"]
+        self.translation, self.random_word_fr, self.random_word_eng, self.cur_type = dict["bra"], dict["fr"], dict["eng"], dict["type"]
         self.definition = dict["def"]
         self.synonymes = [i[1]["bra"] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng]
 
@@ -134,9 +136,15 @@ class WordTraining(QMainWindow):
         self.select_random_word()
         self.note.setText(self.definition)
         if self.fr2bra:
-            self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
+            if self.type == 'all':
+                self.word.setText(self.random_word_fr + " / " + self.random_word_eng +' ('+self.cur_type+')')
+            else:
+                self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
         else:
-            self.word.setText(self.translation)
+            if self.type == 'all':
+                self.word.setText(self.translation +' ('+self.cur_type+')')
+            else:
+                self.word.setText(self.translation)
 
     def switch_translation(self):
         self.fr2bra = not self.fr2bra
