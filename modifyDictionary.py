@@ -210,7 +210,7 @@ class ModifyDictionary(QMainWindow):
                 self.conj4.setText(self.t4)
                 self.conj5.setText(self.t5)
                 self.conj6.setText(self.t6)
-                
+
             self.flag = 1
         else:
             if self.flag:

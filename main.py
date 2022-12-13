@@ -11,6 +11,78 @@ import json
   
 # {"comer": {"fr": "manger", "eng": "eat", "def": "", "type": "verb", "score": 4, "conj": "como_come_comem"}
 
+
+class Clavier(QMainWindow):
+    def __init__(self):        
+        super().__init__()
+        QMainWindow.__init__(self, None, Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
+        self.setGeometry(400,450,200,100)
+        self.setWindowTitle('accents 🇧🇷')
+
+        self.b1 = QPushButton("ã")
+        self.b1.clicked.connect(self.setFocusText)
+        self.b1.metadata = 1
+        self.b2 = QPushButton("á")
+        self.b2.clicked.connect(self.setFocusText)
+        self.b2.metadata = 2
+        self.b3 = QPushButton("ó")
+        self.b3.clicked.connect(self.setFocusText)
+        self.b3.metadata = 3
+        self.widget1 = QWidget()
+        layout_h1 = QHBoxLayout(self.widget1)
+        layout_h1.addWidget(self.b1)
+        layout_h1.addWidget(self.b2)
+        layout_h1.addWidget(self.b3)
+
+        self.b4 = QPushButton("õ")
+        self.b4.clicked.connect(self.setFocusText)
+        self.b4.metadata = 4
+        self.b5 = QPushButton("ú")
+        self.b5.clicked.connect(self.setFocusText)
+        self.b5.metadata = 5
+        self.b6 = QPushButton("í")
+        self.b6.clicked.connect(self.setFocusText)
+        self.b6.metadata = 6
+        self.widget2 = QWidget()
+        layout_h2 = QHBoxLayout(self.widget2)
+        layout_h2.addWidget(self.b4)
+        layout_h2.addWidget(self.b5)
+        layout_h2.addWidget(self.b6)
+
+        self.form_1 = QFormLayout()
+        self.form_1.addRow(self.widget1)
+        self.form_1.addRow(self.widget2)
+
+        layout = QGridLayout()
+
+        layout.addLayout(self.form_1, 0, 0)
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+    
+    def setFocusText(self):
+        sender = self.sender()
+        i = sender.metadata
+        self.lineEditFocused = QApplication.focusWidget()
+        if type(self.lineEditFocused) is QLineEdit:
+            if i == 1:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ã')
+            elif i == 2:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'á')
+            elif i == 3:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ó')
+            elif i == 4:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'õ')
+            elif i == 5:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ú')
+            elif i == 6:
+                self.lineEditFocused.setText(self.lineEditFocused.text() + 'í')
+
+    def closeEvent(self, event):
+        global key_flag
+        key_flag = 0
+        event.accept()
+
 class MainWindow(QMainWindow):
     def __init__(self, width, height):
         super(MainWindow, self).__init__()
@@ -18,6 +90,18 @@ class MainWindow(QMainWindow):
 
         self.setGeometry(200,200,1000,800)
         self.setWindowTitle('🇧🇷')
+
+        toolbar = QToolBar("My main toolbar")
+        self.addToolBar(toolbar)
+
+        button_action = QAction("accents keyboard", self)
+        button_action.triggered.connect(self.openKeyboard)
+        toolbar.addAction(button_action)
+        global key_flag
+        key_flag = 1
+ 
+        self.clavier = Clavier()
+        self.clavier.show()
 
         ### layouts ###
 
@@ -323,13 +407,21 @@ class MainWindow(QMainWindow):
         self.form_1.removeRow(idx)
         self.counter[i] -= 1
 
-def window():
+    def openKeyboard(self):
+        global key_flag
+        if key_flag:
+            self.clavier.close()
+            key_flag = 0
+        else:
+            self.clavier = Clavier()
+            self.clavier.show()
+            key_flag = 1
+
+if __name__ == '__main__':
+
     app = QApplication(sys.argv)
     screen_resolution = app.desktop().screenGeometry()
     width, height = screen_resolution.width(), screen_resolution.height()
     win = MainWindow(width, height)
     win.show()
     sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    window()
