@@ -27,6 +27,7 @@ class ModifyDictionary(QMainWindow):
         self.word_input, self.fr_trad_input, self.eng_trad_input, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
         self.type_input = QComboBox()
         self.type_input.addItems(["fn", "mn", "verb", "adj", "other"])
+        self.flag = 0
 
         self.word_input.setText(self.word)
         self.fr_trad_input.setText(self.fr_trad)
@@ -45,25 +46,25 @@ class ModifyDictionary(QMainWindow):
         self.type_input.currentIndexChanged.connect(self.display_conj)
 
         if self.type == "verb":
+            self.flag = 1
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
             self.conj4, self.conj5, self.conj6 = QLineEdit(), QLineEdit(), QLineEdit()
 
             self.widget0 = QWidget()
             layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Presente                     "))
-            layout_h0.addWidget(QLabel("Pretérito Perfeito"))
+            layout_h0.addWidget(QLabel("Eu                               "))
+            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
+            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
             self.widget1 = QWidget()
             layout_h1 = QHBoxLayout(self.widget1)
             layout_h1.addWidget(self.conj1)
-            layout_h1.addWidget(self.conj4)
+            layout_h1.addWidget(self.conj2)            
+            layout_h1.addWidget(self.conj3)
             self.widget2 = QWidget()
             layout_h2 = QHBoxLayout(self.widget2)
-            layout_h2.addWidget(self.conj2)
+            layout_h2.addWidget(self.conj4)
             layout_h2.addWidget(self.conj5)
-            self.widget3 = QWidget()
-            layout_h3 = QHBoxLayout(self.widget3)
-            layout_h3.addWidget(self.conj3)
-            layout_h3.addWidget(self.conj6)
+            layout_h2.addWidget(self.conj6)
 
             if self.conj != "":
                 self.t1, self.t2, self.t3 = self.conj.split('_')
@@ -78,9 +79,8 @@ class ModifyDictionary(QMainWindow):
 
             self.form_1.addRow(QLabel("Conjugation :"))
             self.form_1.addRow(QLabel(""), self.widget0)
-            self.form_1.addRow(QLabel("Eu"), self.widget1)
-            self.form_1.addRow(QLabel("Ele"), self.widget2)
-            self.form_1.addRow(QLabel("Eles"), self.widget3)
+            self.form_1.addRow(QLabel("Presente"), self.widget1)
+            self.form_1.addRow(QLabel("Pretérito Perfeito"), self.widget2)
 
         # buttons
         self.b1 = QPushButton("Modifier")
@@ -126,15 +126,18 @@ class ModifyDictionary(QMainWindow):
                 self.parent.word_list.sortItems()
                 if self.type_input.currentText() == "verb":
                     conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
+                    conj_pp = self.conj4.text() +"_"+ self.conj5.text() +"_"+ self.conj6.text()
                 else:
                     conj = ""
+                    conj_pp = ""
                 self.data[self.word_id] = {"bra": self.word_input.text(),
                                             "fr": self.fr_trad_input.text(), 
                                             "eng": self.eng_trad_input.text(), 
                                             "def": self.definition_input.text(), 
                                             "type": self.type_input.currentText(),
                                             "score" : s,
-                                            "conj": conj}
+                                            "conj": conj,
+                                            "conj_pp": conj_pp}
             else:
                 self.data[self.word_id]["fr"] = self.fr_trad_input.text()
                 self.data[self.word_id]["eng"] = self.eng_trad_input.text()
@@ -142,8 +145,10 @@ class ModifyDictionary(QMainWindow):
                 self.data[self.word_id]["type"] = self.type_input.currentText()
                 if self.type_input.currentText() == "verb":
                     self.data[self.word_id]["conj"] = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
+                    self.data[self.word_id]["conj_pp"] = self.conj4.text() +"_"+ self.conj5.text() +"_"+ self.conj6.text()
                 else:
                     self.data[self.word_id]["conj"] = ""
+                    self.data[self.word_id]["conj_pp"] = ""
             
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
@@ -177,30 +182,38 @@ class ModifyDictionary(QMainWindow):
 
             self.widget0 = QWidget()
             layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Presente                     "))
-            layout_h0.addWidget(QLabel("Pretérito Perfeito"))
+            layout_h0.addWidget(QLabel("Eu                               "))
+            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
+            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
             self.widget1 = QWidget()
             layout_h1 = QHBoxLayout(self.widget1)
             layout_h1.addWidget(self.conj1)
-            layout_h1.addWidget(self.conj4)
+            layout_h1.addWidget(self.conj2)            
+            layout_h1.addWidget(self.conj3)
             self.widget2 = QWidget()
             layout_h2 = QHBoxLayout(self.widget2)
-            layout_h2.addWidget(self.conj2)
+            layout_h2.addWidget(self.conj4)
             layout_h2.addWidget(self.conj5)
-            self.widget3 = QWidget()
-            layout_h3 = QHBoxLayout(self.widget3)
-            layout_h3.addWidget(self.conj3)
-            layout_h3.addWidget(self.conj6)
-
+            layout_h2.addWidget(self.conj6)
             self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
             self.form_1.insertRow(idx+2, QLabel(""), self.widget0)
-            self.form_1.insertRow(idx+3, QLabel("Eu"), self.widget1)
-            self.form_1.insertRow(idx+4, QLabel("Ele"), self.widget2)
-            self.form_1.insertRow(idx+5, QLabel("Eles"), self.widget3)
+            self.form_1.insertRow(idx+3, QLabel("Presente"), self.widget1)
+            self.form_1.insertRow(idx+4, QLabel("Pretérito Perfeito"), self.widget2)
+
+            if self.conj != "":
+                self.t1, self.t2, self.t3 = self.conj.split('_')
+                self.conj1.setText(self.t1)
+                self.conj2.setText(self.t2)
+                self.conj3.setText(self.t3)
+            if self.conj_pp != "":
+                self.t4, self.t5, self.t6 = self.conj_pp.split('_')
+                self.conj4.setText(self.t4)
+                self.conj5.setText(self.t5)
+                self.conj6.setText(self.t6)
+                
             self.flag = 1
         else:
             if self.flag:
-                self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)

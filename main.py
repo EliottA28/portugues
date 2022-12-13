@@ -106,19 +106,33 @@ class MainWindow(QMainWindow):
         # words
         self.select_training_1 = QComboBox()
         self.select_training_1.addItems(["all", "verb", "adj", "noun", "other"])
+        self.mode = QComboBox()
+        self.mode.addItems(["random", "weighted"])
         self.b3 = QPushButton("Ensaio (palavras)")
         self.b3.clicked.connect(self.train_word)
+        self.widget0 = QWidget()
+        layout_h0 = QHBoxLayout(self.widget0)
+        layout_h0.addWidget(self.b3)
+        layout_h0.addWidget(self.select_training_1)
+        layout_h0.addWidget(self.mode)
         
         # conjugation
         self.select_training_2 = QComboBox()
         self.select_training_2.addItems(["all", "regular", "irregular"])
+        self.tense = QComboBox()
+        self.tense.addItems(["presente", "pretérito perfeito"])
         self.b4 = QPushButton("Ensaio (verbos)")
         self.b4.clicked.connect(self.train_conjugation)
+        self.widget1 = QWidget()
+        layout_h1 = QHBoxLayout(self.widget1)
+        layout_h1.addWidget(self.b4)
+        layout_h1.addWidget(self.select_training_2)
+        layout_h1.addWidget(self.tense)
 
         # form
         form_4 = QFormLayout()
-        form_4.addRow(self.b3, self.select_training_1)
-        form_4.addRow(self.b4, self.select_training_2)
+        form_4.addRow(self.widget0)
+        form_4.addRow(self.widget1)
 
         ### layout grid ###
 
@@ -225,11 +239,11 @@ class MainWindow(QMainWindow):
             self.raise_error("Você já sabe essa palavra")   
     
     def train_word(self):
-        self.w1 = WordTraining(self.select_training_1.currentText(), self.screen_dim)
+        self.w1 = WordTraining(self.select_training_1.currentText(), self.screen_dim, self.mode.currentText())
         self.w1.show()
 
     def train_conjugation(self):
-        self.w2 = ConjugationTraining(self.select_training_2.currentText())
+        self.w2 = ConjugationTraining(self.select_training_2.currentText(), self.tense.currentText())
         self.w2.show()
 
     def modify_dictionary(self):
@@ -251,30 +265,26 @@ class MainWindow(QMainWindow):
 
             self.widget0 = QWidget()
             layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Presente                     "))
-            layout_h0.addWidget(QLabel("Pretérito Perfeito"))
+            layout_h0.addWidget(QLabel("Eu                               "))
+            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
+            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
             self.widget1 = QWidget()
             layout_h1 = QHBoxLayout(self.widget1)
             layout_h1.addWidget(self.conj1)
-            layout_h1.addWidget(self.conj4)
+            layout_h1.addWidget(self.conj2)            
+            layout_h1.addWidget(self.conj3)
             self.widget2 = QWidget()
             layout_h2 = QHBoxLayout(self.widget2)
-            layout_h2.addWidget(self.conj2)
+            layout_h2.addWidget(self.conj4)
             layout_h2.addWidget(self.conj5)
-            self.widget3 = QWidget()
-            layout_h3 = QHBoxLayout(self.widget3)
-            layout_h3.addWidget(self.conj3)
-            layout_h3.addWidget(self.conj6)
-
+            layout_h2.addWidget(self.conj6)
             self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
             self.form_1.insertRow(idx+2, QLabel(""), self.widget0)
-            self.form_1.insertRow(idx+3, QLabel("Eu"), self.widget1)
-            self.form_1.insertRow(idx+4, QLabel("Ele"), self.widget2)
-            self.form_1.insertRow(idx+5, QLabel("Eles"), self.widget3)
+            self.form_1.insertRow(idx+3, QLabel("Presente"), self.widget1)
+            self.form_1.insertRow(idx+4, QLabel("Pretérito Perfeito"), self.widget2)
             self.flag = 1
         else:
             if self.flag:
-                self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)

@@ -6,13 +6,14 @@ import json
 import numpy as np
 
 class WordTraining(QMainWindow):
-    def __init__(self, word_type, screen_dim):
+    def __init__(self, word_type, screen_dim, mode):
         super().__init__()
         self.setWindowTitle("Word Training")
         self.setGeometry(200,200,635,320)
         
         # enable switch between translation
         self.fr2bra = True
+        self.mode = mode
 
         # load data
         with open('database.json', 'r') as f:
@@ -78,14 +79,12 @@ class WordTraining(QMainWindow):
         layout.addWidget(self.b2, 4, 2, Qt.AlignRight | Qt.AlignBottom)
 
     def select_random_word(self):
-        self.update_weights()
-        self.weighted_selection()
-
-    def update_weights(self):
-        self.weights = np.exp(-self.scores)/np.sum(np.exp(-self.scores))
-
-    def weighted_selection(self):
-        idx = np.random.choice(len(self.random_word_list), p=self.weights)
+        print(self.mode)
+        if self.mode == "weighted":
+            self.weights = np.exp(-self.scores)/np.sum(np.exp(-self.scores))
+            idx = np.random.choice(len(self.random_word_list), p=self.weights)
+        elif self.mode == "random":
+            idx = np.random.choice(len(self.random_word_list))
         dict = self.random_word_list[idx][1]
         self.word_id = self.random_word_list[idx][0]
         self.translation, self.random_word_fr, self.random_word_eng = dict["bra"], dict["fr"], dict["eng"]
