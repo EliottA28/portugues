@@ -40,7 +40,7 @@ class ModifyDictionary(QMainWindow):
         self.form_1.addRow(QLabel("Português"), self.word_input)
         self.form_1.addRow(QLabel("Francês"), self.fr_trad_input)
         self.form_1.addRow(QLabel("Inglês"), self.eng_trad_input)
-        self.form_1.addRow(QLabel("Definição"), self.definition_input)
+        self.form_1.addRow(QLabel("Nota"), self.definition_input)
         self.form_1.addRow(QLabel("Tipo"), self.type_input)
 
         self.type_input.currentIndexChanged.connect(self.display_conj)
@@ -155,7 +155,6 @@ class ModifyDictionary(QMainWindow):
             self.close()
 
     def delete_word(self):
-        print("test1")
         self.show_popup()
     
     def show_popup(self):
@@ -166,7 +165,6 @@ class ModifyDictionary(QMainWindow):
         msg.exec_()
 
     def popup_button(self, i):
-        print(i.text())
         if i.text() == "&Yes":
             del self.data[self.word_id]
             self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))

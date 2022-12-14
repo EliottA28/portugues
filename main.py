@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
         self.form_1.addRow(QLabel("Português"), self.word)
         self.form_1.addRow(QLabel("Francês"), self.widget_fr)
         self.form_1.addRow(QLabel("Inglês"), self.widget_eng)
-        self.form_1.addRow(QLabel("Definição"), self.definition_input)
+        self.form_1.addRow(QLabel("Nota"), self.definition_input)
         self.form_1.addRow(QLabel("Tipo"), self.type)
         self.form_1.addRow(self.b1)
         ## data interface
@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
         form_3.addRow(self.word_list)
         form_3.addRow(QLabel("Tradução Francesa :"), self.traduction_fr)
         form_3.addRow(QLabel("Tradução Inglesa :"), self.traduction_eng)
-        form_3.addRow(QLabel("Definição :"), self.definition)
+        form_3.addRow(QLabel("Nota :"), self.definition)
         form_3.addRow(self.b5)
         
         ## test knowledge

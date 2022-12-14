@@ -91,21 +91,32 @@ class WordTraining(QMainWindow):
         self.word_id = self.random_word_list[idx][0]
         self.translation, self.random_word_fr, self.random_word_eng, self.cur_type = dict["bra"], dict["fr"], dict["eng"], dict["type"]
         self.definition = dict["def"]
-        self.synonymes = [i[1]["bra"] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng]
+        self.synonymes = [i[1]["bra"] for i in self.random_word_list if i[1]["fr"] == self.random_word_fr and i[1]["eng"] == self.random_word_eng and i[1]["def"] == self.definition]
 
     def reset_knowledge(self):
-        for key in self.data.keys():
-            if self.type == "noun":
-                if self.data[key]["type"] == 'fn' or self.data[key]["type"] == 'mn':
+        self.show_popup()
+    
+    def show_popup(self):
+        msg = QMessageBox()
+        msg.setText("Reset weights ?")
+        msg.setStandardButtons(QMessageBox.Cancel|QMessageBox.Yes)
+        msg.buttonClicked.connect(self.popup_button)
+        msg.exec_()
+
+    def popup_button(self, i):
+        if i.text() == "&Yes":
+            for key in self.data.keys():
+                if self.type == "noun":
+                    if self.data[key]["type"] == 'fn' or self.data[key]["type"] == 'mn':
+                        self.data[key]["score"] = 0
+                elif self.type == "all":
                     self.data[key]["score"] = 0
-            elif self.type == "all":
-                self.data[key]["score"] = 0
-            elif self.data[key]["type"] == self.type:
-                self.data[key]["score"] = 0
-        with open('database.json', 'w') as f:
-            json.dump(self.data, f)
-        self.scores = np.zeros(len(self.random_word_list))
-        self.display_new_word()
+                elif self.data[key]["type"] == self.type:
+                    self.data[key]["score"] = 0
+            with open('database.json', 'w') as f:
+                json.dump(self.data, f)
+            self.scores = np.zeros(len(self.random_word_list))
+            self.display_new_word()
 
     def input_action(self):
         text = self.input_text.text()
