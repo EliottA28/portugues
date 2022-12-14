@@ -155,14 +155,27 @@ class ModifyDictionary(QMainWindow):
             self.close()
 
     def delete_word(self):
-        del self.data[self.word_id]
-        self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
-        item = self.parent.word_list.currentItem()
-        r = self.parent.word_list.row(item)
-        self.parent.word_list.takeItem(r)
-        with open('database.json', 'w') as f:
-            json.dump(self.data, f)
-        self.close()
+        print("test1")
+        self.show_popup()
+    
+    def show_popup(self):
+        msg = QMessageBox()
+        msg.setText("Delete Word ?")
+        msg.setStandardButtons(QMessageBox.Cancel|QMessageBox.Yes)
+        msg.buttonClicked.connect(self.popup_button)
+        msg.exec_()
+
+    def popup_button(self, i):
+        print(i.text())
+        if i.text() == "&Yes":
+            del self.data[self.word_id]
+            self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
+            item = self.parent.word_list.currentItem()
+            r = self.parent.word_list.row(item)
+            self.parent.word_list.takeItem(r)
+            with open('database.json', 'w') as f:
+                json.dump(self.data, f)
+            self.close()
 
     def close_window(self):
         self.close()
