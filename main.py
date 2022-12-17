@@ -9,9 +9,6 @@ from input_form import InputForm
 
 import sys
 import json
-  
-# {"comer": {"fr": "manger", "eng": "eat", "def": "", "type": "verb", "score": 4, "conj": "como_come_comem"}
-
 
 class Clavier(QMainWindow):
     def __init__(self):        
@@ -141,8 +138,8 @@ class MainWindow(QMainWindow):
         # display/modify word info
         self.selected_word = QLabel(self.word_list.currentItem().text())
         self.word_id = self.word_list.currentItem().data(Qt.UserRole)
-        self.traduction_fr = QLabel(' '.join(database[self.word_id]["fr"].split('_')))
-        self.traduction_eng = QLabel(' '.join(database[self.word_id]["eng"].split('_')))
+        self.traduction_fr = QLabel(', '.join(database[self.word_id]["fr"].split('_')))
+        self.traduction_eng = QLabel(', '.join(database[self.word_id]["eng"].split('_')))
         self.definition = QLabel(database[self.word_id]["def"])
         self.definition.setMaximumSize(int(self.width()*0.4), int(self.height()*0.15))
         self.title_3 = QLabel("Palavras ({}) :".format(len(database)))
@@ -330,8 +327,8 @@ class MainWindow(QMainWindow):
             database = json.load(f)
         self.selected_word.setText(self.word_list.currentItem().text())
         self.word_id = self.word_list.currentItem().data(Qt.UserRole)
-        self.traduction_fr.setText(' '.join(database[self.word_id]["fr"].split('_')))
-        self.traduction_eng.setText(' '.join(database[self.word_id]["eng"].split('_')))
+        self.traduction_fr.setText(', '.join(database[self.word_id]["fr"].split('_')))
+        self.traduction_eng.setText(', '.join(database[self.word_id]["eng"].split('_')))
         self.definition.setText(database[self.word_id]["def"])
 
     def openKeyboard(self):

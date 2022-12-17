@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 
 import json
 import numpy as np
+import random
 
 class WordTraining(QMainWindow):
     def __init__(self, word_type, screen_dim, mode):
@@ -39,10 +40,12 @@ class WordTraining(QMainWindow):
         head.setAlignment(Qt.AlignCenter)
 
         # label to show word and note
+        word_fr = self.random_word_fr.split('_')[random.randint(0,len(self.random_word_fr.split('_'))-1)]
+        word_eng = self.random_word_eng.split('_')[random.randint(0,len(self.random_word_eng.split('_'))-1)]
         if self.type == 'all':
-            self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng+ ' (' + self.cur_type + ')', self)
+            self.word = QLabel(word_fr + " / " + word_eng + ' (' + self.cur_type + ')', self)
         else:
-            self.word = QLabel(self.random_word_fr + " / " + self.random_word_eng, self)
+            self.word = QLabel(word_fr + " / " + word_eng, self)
         self.word.setAlignment(Qt.AlignCenter)
         self.word.setFont(QFont('Times', 30))
 
@@ -121,6 +124,8 @@ class WordTraining(QMainWindow):
     def input_action(self):
         text = self.input_text.text()
         text = text.lower()
+        words_fr = self.random_word_fr.split('_')
+        words_eng = self.random_word_eng.split('_')
         if text != "" and self.fr2bra:
             if text == self.translation or text in self.synonymes:
                 self.update_score(self.word_id, 1)
@@ -129,11 +134,12 @@ class WordTraining(QMainWindow):
                 self.display_correction(self.random_word_fr +  " : " + self.translation)
             self.display_new_word()
         elif text != "" and not self.fr2bra:
-            if text == self.random_word_eng or text == self.random_word_fr:
+            if text in words_fr or text in words_eng:
                 self.update_score(self.word_id, 1)
             else:
                 self.update_score(self.word_id, -1)
-                self.display_correction(self.translation +  " : " + self.random_word_fr + ' / ' + self.random_word_eng)
+
+                self.display_correction(self.translation +  " : " + ', '.join(words_fr) + ' / ' + ', '.join(words_eng))
             self.display_new_word()
 
     def update_score(self, key, i):
@@ -146,11 +152,13 @@ class WordTraining(QMainWindow):
         self.input_text.clear()
         self.select_random_word()
         self.note.setText(self.definition)
+        word_fr = self.random_word_fr.split('_')[random.randint(0,len(self.random_word_fr.split('_'))-1)]
+        word_eng = self.random_word_eng.split('_')[random.randint(0,len(self.random_word_eng.split('_'))-1)]
         if self.fr2bra:
             if self.type == 'all':
-                self.word.setText(self.random_word_fr + " / " + self.random_word_eng +' ('+self.cur_type+')')
+                self.word.setText(word_fr + " / " + word_eng +' ('+self.cur_type+')')
             else:
-                self.word.setText(self.random_word_fr + " / " + self.random_word_eng)
+                self.word.setText(word_fr + " / " + word_eng)
         else:
             if self.type == 'all':
                 self.word.setText(self.translation +' ('+self.cur_type+')')

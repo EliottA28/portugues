@@ -140,8 +140,8 @@ class ModifyDictionary(QMainWindow):
                         elif metadata == 1:
                             eng += '_' + widget.children()[1].text()
                 self.data[self.word_id] = {"bra": self.input_form.word.text(),
-                                            "fr": self.input_form.fr_trad.text(), 
-                                            "eng": self.input_form.eng_trad.text(), 
+                                            "fr": self.input_form.fr_trad.text()+fr, 
+                                            "eng": self.input_form.eng_trad.text()+eng, 
                                             "def": self.input_form.definition_input.text(), 
                                             "type": self.input_form.type.currentText(),
                                             "score" : s,
@@ -158,8 +158,8 @@ class ModifyDictionary(QMainWindow):
                             fr += '_' + widget.children()[1].text()
                         elif metadata == 1:
                             eng += '_' + widget.children()[1].text()
-                self.data[self.word_id]["fr"] = self.input_form.fr_trad.text()
-                self.data[self.word_id]["eng"] = self.input_form.eng_trad.text()
+                self.data[self.word_id]["fr"] = self.input_form.fr_trad.text()+fr
+                self.data[self.word_id]["eng"] = self.input_form.eng_trad.text()+eng
                 self.data[self.word_id]["def"] = self.input_form.definition_input.text()
                 self.data[self.word_id]["type"] = self.input_form.type.currentText()
                 if self.input_form.type.currentText() == "verb":
@@ -168,7 +168,6 @@ class ModifyDictionary(QMainWindow):
                 else:
                     self.data[self.word_id]["conj"] = ""
                     self.data[self.word_id]["conj_pp"] = ""
-                print(eng, fr)
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
             self.close()

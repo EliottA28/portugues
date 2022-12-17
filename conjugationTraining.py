@@ -28,7 +28,6 @@ class ConjugationTraining(QMainWindow):
             self.random_word_list = [self.random_word_list[i] for i in range(len(self.random_word_list)) if self.random_word_list[i][1]["type"] == "verb"]
         random.shuffle(self.random_word_list)
         self.length = len(self.random_word_list)
-        print(self.length)
         self.index = 0
 
         # random word
@@ -107,9 +106,11 @@ class ConjugationTraining(QMainWindow):
         text_2 = text_2.lower()
         text_3 = self.input_text_3.text()
         text_3 = text_3.lower()
+        words_fr = self.random_word_fr.split('_')
+        words_eng = self.random_word_eng.split('_')
 
         if text_0 != "" and text_1 != "" and text_2 != "" and text_3 != "":
-            if (text_0 == self.random_word_fr or text_0 == self.random_word_eng) and text_1 == self.t1 and text_2 == self.t2 and text_3 == self.t3:
+            if (text_0 in words_fr or text_0 == words_eng) and text_1 == self.t1 and text_2 == self.t2 and text_3 == self.t3:
                 self.input_text_0.setFocus()
                 self.display_new_word()
 
@@ -119,14 +120,13 @@ class ConjugationTraining(QMainWindow):
             else:
                 msg = QMessageBox()
                 msg.setText("Correction\n")
-                msg.setInformativeText(self.translation +  " : " + self.random_word_fr + "\n" +
+                msg.setInformativeText(self.translation +  " : " + ', '.join(words_fr) + "\n" +
                                        "Eu " + self.t1 + "\n" +
                                        "Ele " + self.t2 + "\n" +
                                        "Eles " + self.t3)
                 msg.exec_()
                 self.input_text_0.setFocus()
                 self.display_new_word()
-                print("error")
 
     def display_new_word(self):
         self.miss_counter = 0
