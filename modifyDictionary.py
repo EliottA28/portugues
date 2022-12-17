@@ -1,6 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
+from input_form import InputForm
 
 import json
 
@@ -10,7 +11,7 @@ class ModifyDictionary(QMainWindow):
         self.setWindowTitle("Modifier")
         self.setGeometry(200,200,500,300)
         
-        self.parent = parent
+        self.p = parent
 
         with open('database.json', 'r') as f:
             self.data = json.load(f)
@@ -18,69 +19,64 @@ class ModifyDictionary(QMainWindow):
         # data input
         self.word = word.text()
         self.word_id = word.data(Qt.UserRole)
-        self.fr_trad = self.data[self.word_id]["fr"]
-        self.eng_trad = self.data[self.word_id]["eng"]
+        self.fr_trad = self.data[self.word_id]["fr"].split('_')
+        self.eng_trad = self.data[self.word_id]["eng"].split('_')
         self.definition = self.data[self.word_id]["def"]
         self.type = self.data[self.word_id]["type"]
         self.conj = self.data[self.word_id]["conj"]
         self.conj_pp = self.data[self.word_id]["conj_pp"]
-        self.word_input, self.fr_trad_input, self.eng_trad_input, self.definition_input = QLineEdit(), QLineEdit(), QLineEdit(), QLineEdit()
-        self.type_input = QComboBox()
-        self.type_input.addItems(["fn", "mn", "verb", "adj", "other"])
-        self.flag = 0
 
-        self.word_input.setText(self.word)
-        self.fr_trad_input.setText(self.fr_trad)
-        self.eng_trad_input.setText(self.eng_trad)
-        self.definition_input.setText(self.definition)
-        self.type_input.setCurrentText(self.type)
+        self.form_1 = QFormLayout()
+        self.input_form = InputForm(self, self.form_1)
+
+        self.input_form.word.setText(self.word)
+        self.input_form.fr_trad.setText(self.fr_trad[0])
+        self.input_form.eng_trad.setText(self.eng_trad[0])
+        self.input_form.definition_input.setText(self.definition)
+        self.input_form.type.setCurrentText(self.type)
 
         # form
-        self.form_1 = QFormLayout()
-        self.form_1.addRow(QLabel("Português"), self.word_input)
-        self.form_1.addRow(QLabel("Francês"), self.fr_trad_input)
-        self.form_1.addRow(QLabel("Inglês"), self.eng_trad_input)
-        self.form_1.addRow(QLabel("Nota"), self.definition_input)
-        self.form_1.addRow(QLabel("Tipo"), self.type_input)
+        for i in range(len(self.fr_trad[1:])):
+            b_rm = QPushButton("-")
+            b_rm.metadata = 0
+            b_rm.clicked.connect(self.rm_translation_row)
+            tr_input = QLineEdit()
+            tr_input.setText(self.fr_trad[i+1])
+            widget_tr = QWidget()
+            layout_h_tr = QHBoxLayout(widget_tr)
+            layout_h_tr.addWidget(tr_input)
+            layout_h_tr.addWidget(b_rm)
+            idx, _ = self.form_1.getWidgetPosition(self.input_form.widget_fr)
+            self.form_1.insertRow(idx + self.input_form.counter[0] + 1, widget_tr)
+            self.input_form.counter[0] += 1
 
-        self.type_input.currentIndexChanged.connect(self.display_conj)
+        for i in range(len(self.eng_trad[1:])):
+            b_rm = QPushButton("-")
+            b_rm.metadata = 1
+            b_rm.clicked.connect(self.rm_translation_row)
+            tr_input = QLineEdit()
+            tr_input.setText(self.eng_trad[i+1])
+            widget_tr = QWidget()
+            layout_h_tr = QHBoxLayout(widget_tr)
+            layout_h_tr.addWidget(tr_input)
+            layout_h_tr.addWidget(b_rm)
+            idx, _ = self.form_1.getWidgetPosition(self.input_form.widget_eng)
+            self.form_1.insertRow(idx + self.input_form.counter[1] + 1, widget_tr)
+            self.input_form.counter[1] += 1
+
+        self.input_form.type.currentIndexChanged.connect(self.display_conj)
 
         if self.type == "verb":
-            self.flag = 1
-            self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
-            self.conj4, self.conj5, self.conj6 = QLineEdit(), QLineEdit(), QLineEdit()
-
-            self.widget0 = QWidget()
-            layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Eu                               "))
-            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
-            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
-            self.widget1 = QWidget()
-            layout_h1 = QHBoxLayout(self.widget1)
-            layout_h1.addWidget(self.conj1)
-            layout_h1.addWidget(self.conj2)            
-            layout_h1.addWidget(self.conj3)
-            self.widget2 = QWidget()
-            layout_h2 = QHBoxLayout(self.widget2)
-            layout_h2.addWidget(self.conj4)
-            layout_h2.addWidget(self.conj5)
-            layout_h2.addWidget(self.conj6)
-
             if self.conj != "":
                 self.t1, self.t2, self.t3 = self.conj.split('_')
-                self.conj1.setText(self.t1)
-                self.conj2.setText(self.t2)
-                self.conj3.setText(self.t3)
+                self.input_form.conj1.setText(self.t1)
+                self.input_form.conj2.setText(self.t2)
+                self.input_form.conj3.setText(self.t3)
             if self.conj_pp != "":
                 self.t4, self.t5, self.t6 = self.conj_pp.split('_')
-                self.conj4.setText(self.t4)
-                self.conj5.setText(self.t5)
-                self.conj6.setText(self.t6)
-
-            self.form_1.addRow(QLabel("Conjugation :"))
-            self.form_1.addRow(QLabel(""), self.widget0)
-            self.form_1.addRow(QLabel("Presente"), self.widget1)
-            self.form_1.addRow(QLabel("Pretérito Perfeito"), self.widget2)
+                self.input_form.conj4.setText(self.t4)
+                self.input_form.conj5.setText(self.t5)
+                self.input_form.conj6.setText(self.t6)
 
         # buttons
         self.b1 = QPushButton("Modifier")
@@ -108,48 +104,71 @@ class ModifyDictionary(QMainWindow):
         widget_3 = QWidget()
         widget_3.setLayout(layout)
         self.setCentralWidget(widget_3)
+        
+        self.init_length = self.form_1.rowCount()
 
     def modify_word(self):
-        if self.word_input.text() == "":
+        if self.input_form.word.text() == "":
             self.raise_error("Enter a Word")
         else:
-            if self.word_input.text() != self.word:
+            if self.input_form.word.text() != self.word:
                 s = self.data[self.word_id]["score"]
                 del self.data[self.word_id]
-                item = self.parent.word_list.findItems(self.word, Qt.MatchExactly)
-                r = self.parent.word_list.row(item[0])
-                self.parent.word_list.takeItem(r)
+                item = self.p.word_list.findItems(self.word, Qt.MatchExactly)
+                r = self.p.word_list.row(item[0])
+                self.p.word_list.takeItem(r)
                 item_to_add = QListWidgetItem()
-                item_to_add.setText(self.word_input.text())   
+                item_to_add.setText(self.input_form.word.text())   
                 item_to_add.setData(Qt.UserRole, self.word_id) 
-                self.parent.word_list.addItem(item_to_add)
-                self.parent.word_list.sortItems()
-                if self.type_input.currentText() == "verb":
-                    conj = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
-                    conj_pp = self.conj4.text() +"_"+ self.conj5.text() +"_"+ self.conj6.text()
+                self.p.word_list.addItem(item_to_add)
+                self.p.word_list.sortItems()
+                if self.input_form.type.currentText() == "verb":
+                    conj = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
+                    conj_pp = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
                 else:
                     conj = ""
                     conj_pp = ""
-                self.data[self.word_id] = {"bra": self.word_input.text(),
-                                            "fr": self.fr_trad_input.text(), 
-                                            "eng": self.eng_trad_input.text(), 
-                                            "def": self.definition_input.text(), 
-                                            "type": self.type_input.currentText(),
+
+                fr = ""
+                eng = ""
+                for i in range(self.init_length, self.form_1.rowCount(), 1):
+                    widget = self.form_1.itemAt(i).widget()
+                    if type(widget) is QWidget and widget.metadata == 3:
+                        metadata = widget.children()[2].metadata
+                        if metadata == 0:
+                            fr += '_' + widget.children()[1].text()
+                        elif metadata == 1:
+                            eng += '_' + widget.children()[1].text()
+                self.data[self.word_id] = {"bra": self.input_form.word.text(),
+                                            "fr": self.input_form.fr_trad.text(), 
+                                            "eng": self.input_form.eng_trad.text(), 
+                                            "def": self.input_form.definition_input.text(), 
+                                            "type": self.input_form.type.currentText(),
                                             "score" : s,
                                             "conj": conj,
                                             "conj_pp": conj_pp}
             else:
-                self.data[self.word_id]["fr"] = self.fr_trad_input.text()
-                self.data[self.word_id]["eng"] = self.eng_trad_input.text()
-                self.data[self.word_id]["def"] = self.definition_input.text()
-                self.data[self.word_id]["type"] = self.type_input.currentText()
-                if self.type_input.currentText() == "verb":
-                    self.data[self.word_id]["conj"] = self.conj1.text() +"_"+ self.conj2.text() +"_"+ self.conj3.text()
-                    self.data[self.word_id]["conj_pp"] = self.conj4.text() +"_"+ self.conj5.text() +"_"+ self.conj6.text()
+                fr = ""
+                eng = ""
+                for i in range(self.init_length, self.form_1.rowCount(), 1):
+                    widget = self.form_1.itemAt(i).widget()
+                    if type(widget) is QWidget and widget.metadata == 3:
+                        metadata = widget.children()[2].metadata
+                        if metadata == 0:
+                            fr += '_' + widget.children()[1].text()
+                        elif metadata == 1:
+                            eng += '_' + widget.children()[1].text()
+                self.data[self.word_id]["fr"] = self.input_form.fr_trad.text()
+                self.data[self.word_id]["eng"] = self.input_form.eng_trad.text()
+                self.data[self.word_id]["def"] = self.input_form.definition_input.text()
+                self.data[self.word_id]["type"] = self.input_form.type.currentText()
+                if self.input_form.type.currentText() == "verb":
+                    self.data[self.word_id]["conj"] = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
+                    self.data[self.word_id]["conj_pp"] = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
                 else:
                     self.data[self.word_id]["conj"] = ""
                     self.data[self.word_id]["conj_pp"] = ""
-            
+                print(eng, fr)
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
             self.close()
@@ -167,10 +186,10 @@ class ModifyDictionary(QMainWindow):
     def popup_button(self, i):
         if i.text() == "&Yes":
             del self.data[self.word_id]
-            self.parent.title_3.setText("Palavras ({}) :".format(len(self.data)))
-            item = self.parent.word_list.currentItem()
-            r = self.parent.word_list.row(item)
-            self.parent.word_list.takeItem(r)
+            self.p.title_3.setText("Palavras ({}) :".format(len(self.data)))
+            item = self.p.word_list.currentItem()
+            r = self.p.word_list.row(item)
+            self.p.word_list.takeItem(r)
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
             self.close()
@@ -184,49 +203,48 @@ class ModifyDictionary(QMainWindow):
         msg.exec_()
 
     def display_conj(self):
-        sender = self.sender()
-        idx, _ = self.form_1.getWidgetPosition(sender)
-        if self.type_input.currentText() == "verb":
-            
-            self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
-            self.conj4, self.conj5, self.conj6 = QLineEdit(), QLineEdit(), QLineEdit()
-
-            self.widget0 = QWidget()
-            layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Eu                               "))
-            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
-            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
-            self.widget1 = QWidget()
-            layout_h1 = QHBoxLayout(self.widget1)
-            layout_h1.addWidget(self.conj1)
-            layout_h1.addWidget(self.conj2)            
-            layout_h1.addWidget(self.conj3)
-            self.widget2 = QWidget()
-            layout_h2 = QHBoxLayout(self.widget2)
-            layout_h2.addWidget(self.conj4)
-            layout_h2.addWidget(self.conj5)
-            layout_h2.addWidget(self.conj6)
-            self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
-            self.form_1.insertRow(idx+2, QLabel(""), self.widget0)
-            self.form_1.insertRow(idx+3, QLabel("Presente"), self.widget1)
-            self.form_1.insertRow(idx+4, QLabel("Pretérito Perfeito"), self.widget2)
-
+        sender = self.p.sender()
+        idx, _ = self.form_1.getWidgetPosition(sender.parent())
+        if self.input_form.type.currentText() == "verb":
             if self.conj != "":
                 self.t1, self.t2, self.t3 = self.conj.split('_')
-                self.conj1.setText(self.t1)
-                self.conj2.setText(self.t2)
-                self.conj3.setText(self.t3)
+                self.input_form.conj1.setText(self.t1)
+                self.input_form.conj2.setText(self.t2)
+                self.input_form.conj3.setText(self.t3)
             if self.conj_pp != "":
                 self.t4, self.t5, self.t6 = self.conj_pp.split('_')
-                self.conj4.setText(self.t4)
-                self.conj5.setText(self.t5)
-                self.conj6.setText(self.t6)
+                self.input_form.conj4.setText(self.t4)
+                self.input_form.conj5.setText(self.t5)
+                self.input_form.conj6.setText(self.t6)
 
-            self.flag = 1
+            self.input_form.flag = 1
         else:
-            if self.flag:
+            if self.input_form.flag:
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
-                self.flag = 0
+                self.input_form.flag = 0
+
+    def add_translation_row(self):
+        sender = self.sender()
+        i = sender.metadata
+        b_rm = QPushButton("-")
+        b_rm.metadata = i
+        b_rm.clicked.connect(self.rm_translation_row)
+        tr_input = QLineEdit()
+        widget_tr = QWidget()
+        layout_h_tr = QHBoxLayout(widget_tr)
+        layout_h_tr.addWidget(tr_input)
+        layout_h_tr.addWidget(b_rm)
+        if self.input_form.counter[i] < self.input_form.number_of_translations:
+            idx, _ = self.form_1.getWidgetPosition(sender.parent())
+            self.form_1.insertRow(idx + self.input_form.counter[i] + 1, widget_tr)
+            self.input_form.counter[i] += 1
+
+    def rm_translation_row(self):
+        sender = self.sender()
+        i = sender.metadata
+        idx, _ = self.form_1.getWidgetPosition(sender.parent())
+        self.form_1.removeRow(idx)
+        self.input_form.counter[i] -= 1
