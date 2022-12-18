@@ -62,12 +62,13 @@ class InputForm():
             self.conj1, self.conj2, self.conj3 = QLineEdit(), QLineEdit(), QLineEdit()
             self.conj4, self.conj5, self.conj6 = QLineEdit(), QLineEdit(), QLineEdit()
 
-            self.widget0 = QWidget()
-            self.widget0.metadata = None
-            layout_h0 = QHBoxLayout(self.widget0)
-            layout_h0.addWidget(QLabel("Eu                               "))
-            layout_h0.addWidget(QLabel("Ele/Ela/Você             "))
-            layout_h0.addWidget(QLabel("Eles/Elas/Vocês"))
+            self.conj1.setPlaceholderText("Eu")
+            self.conj2.setPlaceholderText("Ele/Ela/Você")
+            self.conj3.setPlaceholderText("Eles/Elas/Vocês")
+            self.conj4.setPlaceholderText("Eu")
+            self.conj5.setPlaceholderText("Ele/Ela/Você")
+            self.conj6.setPlaceholderText("Eles/Elas/Vocês")
+
             self.widget1 = QWidget()
             self.widget1.metadata = None
             layout_h1 = QHBoxLayout(self.widget1)
@@ -83,13 +84,11 @@ class InputForm():
             layout_h2.addWidget(self.conj5)
             layout_h2.addWidget(self.conj6)
             self.form_1.insertRow(idx+1, QLabel("Conjugation :"))
-            self.form_1.insertRow(idx+2, self.widget0)
-            self.form_1.insertRow(idx+3, self.widget1)
-            self.form_1.insertRow(idx+4, self.widget2)
+            self.form_1.insertRow(idx+2, self.widget1)
+            self.form_1.insertRow(idx+3, self.widget2)
             self.flag = 1
         else:
             if self.flag:
-                self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)
                 self.form_1.removeRow(idx+1)

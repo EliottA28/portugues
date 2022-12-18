@@ -110,64 +110,40 @@ class ModifyDictionary(QMainWindow):
     def modify_word(self):
         if self.input_form.word.text() == "":
             self.raise_error("Enter a Word")
-        else:
+        else:            
+            fr = ""
+            eng = ""
+            for i in range(self.init_length, self.form_1.rowCount(), 1):
+                widget = self.form_1.itemAt(i).widget()
+                if type(widget) is QWidget and widget.metadata == 3:
+                    metadata = widget.children()[2].metadata
+                    if metadata == 0:
+                        fr += '_' + widget.children()[1].text()
+                    elif metadata == 1:
+                        eng += '_' + widget.children()[1].text()
             if self.input_form.word.text() != self.word:
-                s = self.data[self.word_id]["score"]
-                del self.data[self.word_id]
-                item = self.p.word_list.findItems(self.word, Qt.MatchExactly)
-                r = self.p.word_list.row(item[0])
-                self.p.word_list.takeItem(r)
-                item_to_add = QListWidgetItem()
-                item_to_add.setText(self.input_form.word.text())   
-                item_to_add.setData(Qt.UserRole, self.word_id) 
-                self.p.word_list.addItem(item_to_add)
-                self.p.word_list.sortItems()
-                if self.input_form.type.currentText() == "verb":
-                    conj = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
-                    conj_pp = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
-                else:
-                    conj = ""
-                    conj_pp = ""
-
-                fr = ""
-                eng = ""
-                for i in range(self.init_length, self.form_1.rowCount(), 1):
-                    widget = self.form_1.itemAt(i).widget()
-                    if type(widget) is QWidget and widget.metadata == 3:
-                        metadata = widget.children()[2].metadata
-                        if metadata == 0:
-                            fr += '_' + widget.children()[1].text()
-                        elif metadata == 1:
-                            eng += '_' + widget.children()[1].text()
-                self.data[self.word_id] = {"bra": self.input_form.word.text(),
-                                            "fr": self.input_form.fr_trad.text()+fr, 
-                                            "eng": self.input_form.eng_trad.text()+eng, 
-                                            "def": self.input_form.definition_input.text(), 
-                                            "type": self.input_form.type.currentText(),
-                                            "score" : s,
-                                            "conj": conj,
-                                            "conj_pp": conj_pp}
+                self.data[self.word_id]["bra"] = self.input_form.word.text()
+                items = self.p.word_list.findItems(self.word, Qt.MatchExactly)
+                for item in items:
+                    if item.data(Qt.UserRole) == self.word_id:
+                        r = self.p.word_list.row(item)
+                        self.p.word_list.takeItem(r)
+                        item_to_add = QListWidgetItem()
+                        item_to_add.setText(self.input_form.word.text())   
+                        item_to_add.setData(Qt.UserRole, self.word_id) 
+                        self.p.word_list.addItem(item_to_add)
+                        self.p.word_list.sortItems()
+            self.data[self.word_id]["fr"] = self.input_form.fr_trad.text()+fr
+            self.data[self.word_id]["eng"] = self.input_form.eng_trad.text()+eng
+            self.data[self.word_id]["def"] = self.input_form.definition_input.text()
+            self.data[self.word_id]["type"] = self.input_form.type.currentText()
+            if self.input_form.type.currentText() == "verb":
+                self.data[self.word_id]["conj"] = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
+                self.data[self.word_id]["conj_pp"] = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
             else:
-                fr = ""
-                eng = ""
-                for i in range(self.init_length, self.form_1.rowCount(), 1):
-                    widget = self.form_1.itemAt(i).widget()
-                    if type(widget) is QWidget and widget.metadata == 3:
-                        metadata = widget.children()[2].metadata
-                        if metadata == 0:
-                            fr += '_' + widget.children()[1].text()
-                        elif metadata == 1:
-                            eng += '_' + widget.children()[1].text()
-                self.data[self.word_id]["fr"] = self.input_form.fr_trad.text()+fr
-                self.data[self.word_id]["eng"] = self.input_form.eng_trad.text()+eng
-                self.data[self.word_id]["def"] = self.input_form.definition_input.text()
-                self.data[self.word_id]["type"] = self.input_form.type.currentText()
-                if self.input_form.type.currentText() == "verb":
-                    self.data[self.word_id]["conj"] = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
-                    self.data[self.word_id]["conj_pp"] = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
-                else:
-                    self.data[self.word_id]["conj"] = ""
-                    self.data[self.word_id]["conj_pp"] = ""
+                self.data[self.word_id]["conj"] = ""
+                self.data[self.word_id]["conj_pp"] = ""
+
             with open('database.json', 'w') as f:
                 json.dump(self.data, f)
             self.close()
