@@ -63,18 +63,21 @@ class Clavier(QMainWindow):
         i = sender.metadata
         self.lineEditFocused = QApplication.focusWidget()
         if type(self.lineEditFocused) is QLineEdit:
+            pos = self.lineEditFocused.cursorPosition()
+            text = self.lineEditFocused.text()
             if i == 1:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ã')
+                self.lineEditFocused.setText(text[:pos] + 'ã' + text[pos:])
             elif i == 2:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'á')
+                self.lineEditFocused.setText(text[:pos] + 'á' + text[pos:])
             elif i == 3:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ó')
+                self.lineEditFocused.setText(text[:pos] + 'ó' + text[pos:])
             elif i == 4:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'õ')
+                self.lineEditFocused.setText(text[:pos] + 'õ' + text[pos:])
             elif i == 5:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'ú')
+                self.lineEditFocused.setText(text[:pos] + 'ú' + text[pos:])
             elif i == 6:
-                self.lineEditFocused.setText(self.lineEditFocused.text() + 'í')
+                self.lineEditFocused.setText(text[:pos] + 'í' + text[pos:])
+            self.lineEditFocused.setCursorPosition(pos+1)
 
     def closeEvent(self, event):
         global key_flag

@@ -131,14 +131,13 @@ class WordTraining(QMainWindow):
                 self.update_score(self.word_id, 1)
             else:
                 self.update_score(self.word_id, -1)
-                self.display_correction(self.random_word_fr +  " : " + self.translation)
+                self.display_correction(', '.join(words_fr) +  " : " + self.translation)
             self.display_new_word()
         elif text != "" and not self.fr2bra:
             if text in words_fr or text in words_eng:
                 self.update_score(self.word_id, 1)
             else:
                 self.update_score(self.word_id, -1)
-
                 self.display_correction(self.translation +  " : " + ', '.join(words_fr) + ' / ' + ', '.join(words_eng))
             self.display_new_word()
 
