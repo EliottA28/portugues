@@ -3,27 +3,39 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 
 from wordTraining import WordTraining
-from conjugationTraining import ConjugationTraining
 from modifyDictionary import ModifyDictionary
 from input_form import InputForm
 
+import config
+
 import sys
 import json
+import os
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class Clavier(QMainWindow):
     def __init__(self):        
         super().__init__()
         QMainWindow.__init__(self, None, Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
         self.setGeometry(400,450,200,100)
-        self.setWindowTitle('accents 🇧🇷')
+        self.setWindowTitle('accents 🇫🇷')
 
-        self.b1 = QPushButton("ã")
+        self.b1 = QPushButton("^")
         self.b1.clicked.connect(self.setFocusText)
         self.b1.metadata = 1
-        self.b2 = QPushButton("á")
+        self.b2 = QPushButton("`")
         self.b2.clicked.connect(self.setFocusText)
         self.b2.metadata = 2
-        self.b3 = QPushButton("ó")
+        self.b3 = QPushButton("¨")
         self.b3.clicked.connect(self.setFocusText)
         self.b3.metadata = 3
         self.widget1 = QWidget()
@@ -32,13 +44,13 @@ class Clavier(QMainWindow):
         layout_h1.addWidget(self.b2)
         layout_h1.addWidget(self.b3)
 
-        self.b4 = QPushButton("õ")
+        self.b4 = QPushButton("ç")
         self.b4.clicked.connect(self.setFocusText)
         self.b4.metadata = 4
-        self.b5 = QPushButton("ú")
+        self.b5 = QPushButton("é")
         self.b5.clicked.connect(self.setFocusText)
         self.b5.metadata = 5
-        self.b6 = QPushButton("í")
+        self.b6 = QPushButton("œ")
         self.b6.clicked.connect(self.setFocusText)
         self.b6.metadata = 6
         self.widget2 = QWidget()
@@ -66,17 +78,36 @@ class Clavier(QMainWindow):
             pos = self.lineEditFocused.cursorPosition()
             text = self.lineEditFocused.text()
             if i == 1:
-                self.lineEditFocused.setText(text[:pos] + 'ã' + text[pos:])
+                if text[pos-1] == 'e':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ê' + text[pos:])
+                elif text[pos-1] == 'a':
+                    self.lineEditFocused.setText(text[:pos-1] + 'â' + text[pos:])
+                elif text[pos-1] == 'i':
+                    self.lineEditFocused.setText(text[:pos-1] + 'î' + text[pos:])
+                elif text[pos-1] == 'o':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ô' + text[pos:])
+                elif text[pos-1] == 'u':
+                    self.lineEditFocused.setText(text[:pos-1] + 'û' + text[pos:])
             elif i == 2:
-                self.lineEditFocused.setText(text[:pos] + 'á' + text[pos:])
+                if text[pos-1] == 'e':
+                    self.lineEditFocused.setText(text[:pos-1] + 'è' + text[pos:])
+                elif text[pos-1] == 'a':
+                    self.lineEditFocused.setText(text[:pos-1] + 'à' + text[pos:])
+                elif text[pos-1] == 'i':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ù' + text[pos:])
             elif i == 3:
-                self.lineEditFocused.setText(text[:pos] + 'ó' + text[pos:])
+                if text[pos-1] == 'e':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ë' + text[pos:])
+                elif text[pos-1] == 'i':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ï' + text[pos:])
+                elif text[pos-1] == 'u':
+                    self.lineEditFocused.setText(text[:pos-1] + 'ü' + text[pos:])
             elif i == 4:
-                self.lineEditFocused.setText(text[:pos] + 'õ' + text[pos:])
+                self.lineEditFocused.setText(text[:pos] + 'ç' + text[pos:])
             elif i == 5:
-                self.lineEditFocused.setText(text[:pos] + 'ú' + text[pos:])
+                self.lineEditFocused.setText(text[:pos] + 'é' + text[pos:])
             elif i == 6:
-                self.lineEditFocused.setText(text[:pos] + 'í' + text[pos:])
+                self.lineEditFocused.setText(text[:pos] + 'œ' + text[pos:])
             self.lineEditFocused.setCursorPosition(pos+1)
 
     def closeEvent(self, event):
@@ -90,12 +121,12 @@ class MainWindow(QMainWindow):
         self.screen_dim = (width, height)
 
         self.setGeometry(200,200,1000,800)
-        self.setWindowTitle('🇧🇷')
+        self.setWindowTitle('🇫🇷')
 
-        toolbar = QToolBar("My main toolbar")
+        toolbar = QToolBar("toolbar")
         self.addToolBar(toolbar)
 
-        button_action = QAction("accents keyboard", self)
+        button_action = QAction("clavier accents", self)
         button_action.triggered.connect(self.openKeyboard)
         toolbar.addAction(button_action)
         global key_flag
@@ -108,9 +139,9 @@ class MainWindow(QMainWindow):
 
         ## add word to dictionary
         # inputs
-        self.title_1 = QLabel("Adicionar uma Nova Palavra :")
+        self.title_1 = QLabel("Ajouter un Nouveau Mot :")
         self.title_1.setFont(QFont("Helvetica", 20, QFont.Bold))
-        self.b1 = QPushButton("Adicionar uma Nova Palavra")
+        self.b1 = QPushButton("Ajouter")
         self.b1.clicked.connect(self.fill_dictionary)
 
         # form
@@ -121,11 +152,16 @@ class MainWindow(QMainWindow):
         ## data interface
         # word list
         self.word_list = QListWidget()
+        file = 'database.json'
+        if not(os.path.isfile(file) and os.access(file, os.R_OK)):
+            with open(file, 'w') as f:
+                f.write(json.dumps({}))
         with open('database.json', 'r+') as f:
             database = json.load(f)
+
         for key in database.keys():
             item_to_add = QListWidgetItem()
-            item_to_add.setText(database[key]["bra"])   
+            item_to_add.setText(database[key]["unknown"])   
             item_to_add.setData(Qt.UserRole, key) 
             self.word_list.addItem(item_to_add)
         self.word_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -139,13 +175,17 @@ class MainWindow(QMainWindow):
         self.search_bar.returnPressed.connect(self.search_word)
 
         # display/modify word info
-        self.selected_word = QLabel(self.word_list.currentItem().text())
-        self.word_id = self.word_list.currentItem().data(Qt.UserRole)
-        self.traduction_fr = QLabel(', '.join(database[self.word_id]["fr"].split('_')))
-        self.traduction_eng = QLabel(', '.join(database[self.word_id]["eng"].split('_')))
-        self.definition = QLabel(database[self.word_id]["def"])
-        self.definition.setMaximumSize(int(self.width()*0.4), int(self.height()*0.15))
-        self.title_3 = QLabel("Palavras ({}) :".format(len(database)))
+        self.selected_word = QLabel('')
+        self.traduction_fr = QLabel('')
+        self.notes = QPlainTextEdit()
+        self.notes.setReadOnly(True)
+        self.notes.setMaximumSize(int(self.width()*0.4), int(self.height()*0.15))
+        if self.word_list.currentItem() is not None:
+            self.selected_word.setText(self.word_list.currentItem().text())
+            self.word_id = self.word_list.currentItem().data(Qt.UserRole)
+            self.traduction_fr.setText(', '.join(database[self.word_id]["known"].split('_')))
+            self.notes.setPlainText(database[self.word_id]["notes"])
+        self.title_3 = QLabel("Mots ({}) :".format(len(database)))
         self.title_3.setFont(QFont("Helvetica", 20, QFont.Bold))
         self.b5 = QPushButton("Modifier/Supprimer")
         self.b5.clicked.connect(self.modify_dictionary)
@@ -153,20 +193,19 @@ class MainWindow(QMainWindow):
         # form
         form_3 = QFormLayout()
         form_3.addRow(self.title_3)
-        form_3.addRow(QLabel("Search Word :"), self.search_bar)
+        form_3.addRow(QLabel("Rechercher un Mot :"), self.search_bar)
         form_3.addRow(self.word_list)
-        form_3.addRow(QLabel("Tradução Francesa :"), self.traduction_fr)
-        form_3.addRow(QLabel("Tradução Inglesa :"), self.traduction_eng)
-        form_3.addRow(QLabel("Nota :"), self.definition)
+        form_3.addRow(QLabel("Traduction :"), self.traduction_fr)
+        form_3.addRow(QLabel("Notes :"), self.notes)
         form_3.addRow(self.b5)
         
         ## test knowledge
         # words
         self.select_training_1 = QComboBox()
-        self.select_training_1.addItems(["all", "verb", "adj", "noun", "other"])
+        self.select_training_1.addItems([config.ALL, config.VERB, "adjectif", config.NOUN, "autre"])
         self.mode = QComboBox()
-        self.mode.addItems(["random", "weighted"])
-        self.b3 = QPushButton("Ensaio (palavras)")
+        self.mode.addItems([config.RANDOM, "weighted", "test"])
+        self.b3 = QPushButton("Quiz (mots)")
         self.b3.clicked.connect(self.train_word)
         self.widget0 = QWidget()
         layout_h0 = QHBoxLayout(self.widget0)
@@ -174,23 +213,9 @@ class MainWindow(QMainWindow):
         layout_h0.addWidget(self.select_training_1)
         layout_h0.addWidget(self.mode)
         
-        # conjugation
-        self.select_training_2 = QComboBox()
-        self.select_training_2.addItems(["all", "regular", "irregular"])
-        self.tense = QComboBox()
-        self.tense.addItems(["presente", "pretérito perfeito"])
-        self.b4 = QPushButton("Ensaio (verbos)")
-        self.b4.clicked.connect(self.train_conjugation)
-        self.widget1 = QWidget()
-        layout_h1 = QHBoxLayout(self.widget1)
-        layout_h1.addWidget(self.b4)
-        layout_h1.addWidget(self.select_training_2)
-        layout_h1.addWidget(self.tense)
-
         # form
         form_4 = QFormLayout()
         form_4.addRow(self.widget0)
-        form_4.addRow(self.widget1)
 
         ### layout grid ###
 
@@ -218,29 +243,19 @@ class MainWindow(QMainWindow):
             database = json.load(f)
         bra_words = []
         fr_words = [[],[],[],[]]
-        eng_words = [[],[],[],[]]
         for k in database.keys():
-            bra_words.append(database[k]["bra"])
-            fr = database[k]["fr"].split('_')
+            bra_words.append(database[k]["unknown"])
+            fr = database[k]["known"].split('_')
             fr_words[0].append(fr[0])
             for i in range(1, len(fr), 1):
                 fr_words[i].append(fr[i])
             for i in range(len(fr), 4, 1):
                 fr_words[i].append('')
-            eng = database[k]["eng"].split('_')
-            eng_words[0].append(eng[0])
-            for i in range(1, len(eng), 1):
-                eng_words[i].append(eng[i])
-            for i in range(len(eng), 4, 1):
-                eng_words[i].append('')
 
-        word = self.search_bar.text()
+        word = self.search_bar.text().strip().lower()
         for i in range(4):
             if word in fr_words[i]:
                 idx = fr_words[i].index(word)
-                word = bra_words[idx]
-            elif word in eng_words[i]:
-                idx = eng_words[i].index(word)
                 word = bra_words[idx]
         model = self.word_list.model()
         match = model.match(
@@ -251,7 +266,7 @@ class MainWindow(QMainWindow):
             flags=Qt.MatchExactly)
         if match:
             self.word_list.setCurrentIndex(match[0])
-    
+
     def check(self, word, data, i):
         words = []
         for d in data:
@@ -263,62 +278,64 @@ class MainWindow(QMainWindow):
         with open('database.json', 'r+') as f:
             database = json.load(f)
 
-        data = [(key, value["bra"], value["type"]) for key, value in database.items()]
+        data = [(key, value["unknown"], value["type"]) for key, value in database.items()]
 
-        if len(self.input_form.word.text()) == 0:
-            self.raise_error("Enter a word")
-        elif self.input_form.type.currentText() == "verb" and (self.input_form.conj1.text() == "" or self.input_form.conj2.text() == "" or self.input_form.conj3.text() == "" or self.input_form.conj4.text() == "" or self.input_form.conj5.text() == "" or self.input_form.conj6.text() == ""):
-            self.raise_error("Enter conjugaison")
-        elif not self.check(self.input_form.word.text(), data, 1) or self.input_form.type.currentText() not in self.check(self.input_form.word.text(), data, 1):
-            if self.input_form.type.currentText() == "verb":
-                conj_p = self.input_form.conj1.text() +"_"+ self.input_form.conj2.text() +"_"+ self.input_form.conj3.text()
-                conj_pp = self.input_form.conj4.text() +"_"+ self.input_form.conj5.text() +"_"+ self.input_form.conj6.text()
-            else:
-                conj_p = ""
-                conj_pp = ""
-                
+        if len(self.input_form.word.text().strip().lower()) == 0 and len(self.input_form.fr_trad.text().strip().lower()) == 0:
+            self.raise_error("Entrer un mot et au moins une traduction")
+        elif len(self.input_form.fr_trad.text().strip().lower()) == 0:
+            self.raise_error("Entrer une traduction")
+        elif len(self.input_form.word.text().strip().lower()) == 0:
+            self.raise_error("Entrer un mot")
+        elif not self.check(self.input_form.word.text().strip().lower(), data, 1) or self.input_form.type.currentText() not in self.check(self.input_form.word.text().strip().lower(), data, 1):
             fr = ""
-            eng = ""
             for i in range(self.init_length, self.form_1.rowCount(), 1):
                 widget = self.form_1.itemAt(i).widget()
                 if type(widget) is QWidget and widget.metadata == 3:
                     metadata = widget.children()[2].metadata
                     if metadata == 0:
                         fr += '_' + widget.children()[1].text()
-                    elif metadata == 1:
-                        eng += '_' + widget.children()[1].text()
 
-            key = str(int(list(database)[-1])+1)
-            database[key] = {"bra": self.input_form.word.text(),
-                            "fr": self.input_form.fr_trad.text()+fr, 
-                            "eng": self.input_form.eng_trad.text()+eng, 
-                            "def": self.input_form.definition_input.text(), 
+            if len(data) > 0:
+                key = str(int(list(database)[-1])+1)
+            else:
+                key = '0'
+            database[key] = {"unknown": self.input_form.word.text().strip().lower(),
+                            "known": self.input_form.fr_trad.text().strip().lower()+fr, 
+                            "notes": self.input_form.notes_input.toPlainText(), 
                             "type": self.input_form.type.currentText(),
-                            "score" : 0,
-                            "conj": conj_p,
-                            "conj_pp": conj_pp}
+                            "score" : 0}
             item_to_add = QListWidgetItem()
-            item_to_add.setText(self.input_form.word.text())   
+            item_to_add.setText(self.input_form.word.text().strip().lower())   
             item_to_add.setData(Qt.UserRole, key) 
             self.word_list.addItem(item_to_add)
             self.word_list.sortItems()
-            self.title_3.setText("Palavras ({}) :".format(len(database)))
+            self.title_3.setText("Mots ({}) :".format(len(database)))
             with open('database.json', 'w') as f:
                 json.dump(database, f)
         else:
-            self.raise_error("Você já sabe essa palavra")   
+            self.raise_error("Mot déjà connu")   
     
     def train_word(self):
-        self.w1 = WordTraining(self.select_training_1.currentText(), self.screen_dim, self.mode.currentText())
-        self.w1.show()
-
-    def train_conjugation(self):
-        self.w2 = ConjugationTraining(self.select_training_2.currentText(), self.tense.currentText())
-        self.w2.show()
+        with open('database.json', 'r+') as f:
+            database = json.load(f)
+        word_type = self.select_training_1.currentText()
+        words = list(database.items())
+        if word_type == config.ALL:
+            word_list = [words[i] for i in range(len(words))]
+        else:
+            word_list = [words[i] for i in range(len(words)) if words[i][1]["type"] == word_type]
+        if len(word_list) > 0:
+            self.w1 = WordTraining(word_type, self.screen_dim, self.mode.currentText())
+            self.w1.show()
+        else:
+            msg = QMessageBox()
+            msg.setText("Aucun mot de type : {}\n".format(word_type))
+            msg.exec_()
 
     def modify_dictionary(self):
-        self.w3 = ModifyDictionary(self.word_list.currentItem(), parent=self)
-        self.w3.show()
+        if self.word_list.currentItem() != None:
+            self.w3 = ModifyDictionary(self.word_list.currentItem(), parent=self)
+            self.w3.show()
 
     def raise_error(self, error):
         msg = QMessageBox()
@@ -328,11 +345,15 @@ class MainWindow(QMainWindow):
     def selection_changed(self):
         with open('database.json', 'r+') as f:
             database = json.load(f)
-        self.selected_word.setText(self.word_list.currentItem().text())
-        self.word_id = self.word_list.currentItem().data(Qt.UserRole)
-        self.traduction_fr.setText(', '.join(database[self.word_id]["fr"].split('_')))
-        self.traduction_eng.setText(', '.join(database[self.word_id]["eng"].split('_')))
-        self.definition.setText(database[self.word_id]["def"])
+        if self.word_list.currentItem() is not None:
+            self.selected_word.setText(self.word_list.currentItem().text())
+            self.word_id = self.word_list.currentItem().data(Qt.UserRole)
+            self.traduction_fr.setText(', '.join(database[self.word_id]["known"].split('_')))
+            self.notes.setPlainText(database[self.word_id]["notes"])
+        else:
+            self.selected_word.setText('')
+            self.traduction_fr.setText('')
+            self.notes.setPlainText('')
 
     def openKeyboard(self):
         global key_flag
