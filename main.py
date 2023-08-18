@@ -346,6 +346,9 @@ class MainWindow(QMainWindow):
             self.clavier.show()
             key_flag = 1
 
+    def closeEvent(self, event):
+        QApplication.closeAllWindows()
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)

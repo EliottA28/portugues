@@ -117,7 +117,7 @@ class WordTraining(QMainWindow):
         self.word_id = self.random_word_list[idx][0]
         self.translation, self.random_word_fr, self.cur_type = dict["unknown"], dict["known"], dict["type"]
         self.definition = dict["notes"]
-        self.synonymes = [i[1]["unknown"] for i in self.random_word_list if i[1]["known"] == self.random_word_fr and i[1]["notes"] == self.definition]
+        self.synonymes = [i[1]["unknown"] for i in self.random_word_list if i[1]["known"] == self.random_word_fr and i[1]["notes"].strip() == self.definition.strip()]
 
     def reset_knowledge(self):
         self.show_popup()

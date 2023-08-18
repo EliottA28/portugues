@@ -3,8 +3,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 from input_form import InputForm
 import config 
-
-
 import json
 
 class ModifyDictionary(QMainWindow):
