@@ -12,7 +12,7 @@ class InputForm():
 
         self.word, self.fr_trad, self.notes_input = QLineEdit(), QLineEdit(), QPlainTextEdit()
         self.type = QComboBox()
-        self.type.addItems(["nom féminin", "nom masculin", config.VERB, "adjectif", "autre"])
+        self.type.addItems([config.FN, config.MN, config.VERB, config.ADJ, config.OTHER])
         self.flag = 0
         self.wword = QWidget()
         layout_h_w = QHBoxLayout(self.wword)

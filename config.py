@@ -6,6 +6,10 @@ NOTES = "Notes"
 TYPE = "Type"
 
 VERB = "verbe"
+ADJ = "adjectif"
+OTHER = "autre"
+MN = "nom masculin"
+FN = "nom féminin"
 ALL = "tous"
 NOUN = "nom"
 

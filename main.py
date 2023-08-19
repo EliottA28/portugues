@@ -183,7 +183,7 @@ class MainWindow(QMainWindow):
         ## test knowledge
         # words
         self.select_training_1 = QComboBox()
-        self.select_training_1.addItems([config.ALL, config.VERB, "adjectif", config.NOUN, "autre"])
+        self.select_training_1.addItems([config.ALL, config.VERB, config.ADJ, config.NOUN, config.OTHER])
         self.mode = QComboBox()
         self.mode.addItems([config.RANDOM, "weighted", "test"])
         self.b3 = QPushButton("Quiz (mots)")
